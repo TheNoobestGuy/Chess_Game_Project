@@ -155,9 +155,6 @@
   <ItemGroup>
     <Image Include="Textures\Figures\pawn.png" />
   </ItemGroup>
-  <ItemGroup>
-    <Library Include="Libraries\SDL2_Image\lib\x64\SDL2_image.lib" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

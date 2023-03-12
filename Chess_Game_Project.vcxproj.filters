@@ -54,7 +54,4 @@
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
-  <ItemGroup>
-    <Library Include="Libraries\SDL2_Image\lib\x64\SDL2_image.lib" />
-  </ItemGroup>
 </Project>
