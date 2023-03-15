@@ -138,14 +138,18 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Assets\Figure.cpp" />
+    <ClCompile Include="Source\Chessboard.cpp" />
     <ClCompile Include="Source\Client.cpp" />
     <ClCompile Include="Source\GameEngine.cpp" />
+    <ClCompile Include="Source\GameObject.cpp" />
     <ClCompile Include="Source\TextureMenager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Assets\Figure.h" />
     <ClInclude Include="Libraries\SDL2_Image\include\SDL_image.h" />
+    <ClInclude Include="Source\Chessboard.h" />
     <ClInclude Include="Source\GameEngine.h" />
+    <ClInclude Include="Source\GameObject.h" />
     <ClInclude Include="Source\TextureMenager.h" />
   </ItemGroup>
   <ItemGroup>

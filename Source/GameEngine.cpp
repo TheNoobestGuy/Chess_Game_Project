@@ -1,9 +1,12 @@
 #include "GameEngine.h"
 #include "TextureMenager.h"
+#include "GameObject.h"
 
-// Texture calls
-SDL_Texture* pawnTex;
-SDL_Rect srcR, destR;
+// Renderer
+SDL_Renderer* Game::renderer = nullptr;
+
+// Figures
+GameObject* pawn;
 
 // Functions
 Game::Game() {}
@@ -14,7 +17,7 @@ void Game::Init(const char* title, int x, int y, int width, int height, bool ful
 {
 	int flags = 0;
 
-	if (fullscreen == true)
+	if (fullscreen)
 		flags = SDL_WINDOW_FULLSCREEN;
 
 	if (SDL_Init(SDL_INIT_EVERYTHING) == 0)
@@ -32,7 +35,7 @@ void Game::Init(const char* title, int x, int y, int width, int height, bool ful
 			renderer = SDL_CreateRenderer(window, -1, 0);
 			if (renderer)
 			{
-				SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+				SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
 				printf("Renderer has been created!\n");
 
 				isRunning = true;
@@ -49,8 +52,8 @@ void Game::Init(const char* title, int x, int y, int width, int height, bool ful
 			isRunning = false;
 		}
 
-		// Pawn
-		pawnTex = TextureMenager::LoadTexture("Textures/Figures/pawn.png", renderer);
+		// Figures
+		pawn = new GameObject("Textures/Figures/pawn.png", 0, 0);
 	}
 	else
 	{
@@ -77,14 +80,7 @@ void Game::EventsHandler()
 
 void Game::Update()
 {
-	counter++;
-
-	// Pawn 
-	destR.h = 64;
-	destR.w = 64;
-	destR.x = counter;
-
-	printf("%i\n", counter);
+	pawn->Update();
 }
 
 void Game::Render()
@@ -92,7 +88,7 @@ void Game::Render()
 	SDL_RenderClear(renderer);
 
 	// Renders
-	SDL_RenderCopy(renderer, pawnTex, NULL, &destR);
+	pawn->Render();
 
 	SDL_RenderPresent(renderer);
 }
