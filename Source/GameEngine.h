@@ -1,13 +1,16 @@
 #pragma once
 
 // Basic Libraries
+#include <iostream>
 #include <stdio.h>
+#include <vector>
+#include <tuple>
 
 // SDL Libraries
 #include <SDL.h>
 #include <SDL_image.h>
 
-class Game
+class GameEngine
 {
 	private:
 		int counter;
@@ -15,15 +18,18 @@ class Game
 		SDL_Window* window;
 
 	public:
-		Game();
-		~Game();
+		GameEngine();
+		~GameEngine();;
 
 		void Init(const char* title, int x, int y, int width, int height, bool fullscreen);
-		
+
 		void EventsHandler();
 		void Update();
 		void Render();
 		void Clean();
+
+		static int GetMouseX();
+		static int GetMouseY();
 
 		bool Running() { return isRunning; }
 

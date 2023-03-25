@@ -1,6 +1,5 @@
 #pragma once
 
-#include "GameEngine.h"
 #include "TextureMenager.h"
 #include "Chessboard.h"
 
@@ -13,13 +12,21 @@ class Figure : protected Chessboard
 		virtual void Update() = 0;
 		virtual void Render() = 0;
 
+		bool MouseColliding(int mouse_x, int mouse_y, SDL_Rect Rect);
+		SDL_Rect RectGetter();
+
+		void InMotionSetter(bool in_motion);
+
 	protected:
 		int row_pos;
 		int column_pos;
 		int color;
 		int set;
 
-		virtual void MovesList() = 0;
+		std::vector<std::tuple<SDL_Rect, SDL_Rect>> possible_moves;
+		bool in_motion;
+
+		virtual void PossibleMoves() = 0;
 
 		// Textures
 		SDL_Rect srcRect, destRect;

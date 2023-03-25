@@ -6,8 +6,16 @@
 #include "Chessboard.h"
 #include "Pawn.h"
 
+// Mouse tracer
+int mouse_x, mouse_y;
+bool mouse_left_click_hold = false;
+
+// Picked figure
+bool picked = false;
+Pawn* current_picked_pawn = nullptr;
+
 // Renderer
-SDL_Renderer* Game::renderer = nullptr;
+SDL_Renderer* GameEngine::renderer = nullptr;
 
 // Chessboard
 Chessboard* chessboard;
@@ -33,11 +41,17 @@ Pawn* black_pawn_7;
 Pawn* black_pawn_8;
 
 // Functions
-Game::Game() {}
+GameEngine::GameEngine()
+{
+	// Mouse tracer
+	mouse_x = 0;
+	mouse_y = 0;
+	mouse_left_click_hold = false;
+}
 
-Game::~Game() {}
+GameEngine::~GameEngine() {}
 
-void Game::Init(const char* title, int x, int y, int width, int height, bool fullscreen)
+void GameEngine::Init(const char* title, int x, int y, int width, int height, bool fullscreen)
 {
 	int flags = 0;
 
@@ -106,23 +120,70 @@ void Game::Init(const char* title, int x, int y, int width, int height, bool ful
 	}
 }
 
-void Game::EventsHandler()
+void GameEngine::EventsHandler()
 {
 	SDL_Event event;
 	SDL_PollEvent(&event);
 
+	// Mouse position
+	SDL_GetMouseState(&mouse_x, &mouse_y);
+
+	// Collisions
+	bool figures_collisions[8] =
+	{
+		white_pawn_1->MouseColliding(mouse_x, mouse_y, white_pawn_1->RectGetter()),
+		white_pawn_2->MouseColliding(mouse_x, mouse_y, white_pawn_2->RectGetter()),
+		white_pawn_3->MouseColliding(mouse_x, mouse_y, white_pawn_3->RectGetter()),
+		white_pawn_4->MouseColliding(mouse_x, mouse_y, white_pawn_4->RectGetter()),
+		white_pawn_5->MouseColliding(mouse_x, mouse_y, white_pawn_5->RectGetter()),
+		white_pawn_6->MouseColliding(mouse_x, mouse_y, white_pawn_6->RectGetter()),
+		white_pawn_7->MouseColliding(mouse_x, mouse_y, white_pawn_7->RectGetter()),
+		white_pawn_8->MouseColliding(mouse_x, mouse_y, white_pawn_8->RectGetter())
+	};
+
 	switch (event.type)
 	{
-		case SDL_QUIT:
-			isRunning = false;
-			break;
+	case SDL_QUIT:
+		isRunning = false;
+		break;
 
-		default:
-			break;
+	case SDL_MOUSEMOTION:
+		std::cout << "Mouse coord: " << mouse_x << ", " << mouse_y << std::endl;
+		break;
+
+	case SDL_MOUSEBUTTONDOWN:
+		mouse_left_click_hold = true;
+		break;
+
+	case SDL_MOUSEBUTTONUP:
+		mouse_left_click_hold = false;
+		break;
+
+	default:
+		break;
+	}
+
+	// Motion of figures
+	Figure* current_picked = nullptr;
+
+	if (figures_collisions[0] && mouse_left_click_hold)
+	{
+		white_pawn_1->InMotionSetter(true);
+
+		current_picked_pawn = white_pawn_1;
+		picked = true;
+	}
+
+	if (!mouse_left_click_hold)
+	{
+		white_pawn_1->InMotionSetter(false);
+
+		current_picked_pawn = nullptr;
+		picked = false;
 	}
 }
 
-void Game::Update()
+void GameEngine::Update()
 {
 	// White player figures
 	white_pawn_1->Update();
@@ -145,7 +206,7 @@ void Game::Update()
 	black_pawn_8->Update();
 }
 
-void Game::Render()
+void GameEngine::Render()
 {
 	SDL_RenderClear(renderer);
 
@@ -171,13 +232,27 @@ void Game::Render()
 	black_pawn_7->Render();
 	black_pawn_8->Render();
 
+	// Current picked object
+	if (picked && current_picked_pawn != nullptr)
+		current_picked_pawn->Render();
+
 	SDL_RenderPresent(renderer);
 }
 
-void Game::Clean()
+void GameEngine::Clean()
 {
 	SDL_DestroyWindow(window);
 	SDL_DestroyRenderer(renderer);
 	SDL_Quit();
 	printf("Game Successfully Closed!\n");
+}
+
+int GameEngine::GetMouseX()
+{
+	return mouse_x;
+}
+
+int GameEngine::GetMouseY()
+{
+	return mouse_y;
 }

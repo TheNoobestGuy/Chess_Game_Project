@@ -2,17 +2,22 @@
 
 #include "Figure.h"
 
-class Pawn : protected Figure
+class Pawn : public Figure
 {
 	public:
 		// Inheritance of constructor
 		using Figure::Figure;
 
+		// Inheritance of functions
+		using Figure::MouseColliding;
+		using Figure::InMotionSetter;
+		using Figure::RectGetter;
+
 		void Update();
 		void Render();
 
 	private:
-		void MovesList();
+		void PossibleMoves();
 
 		SDL_Texture* texture = pawns_textures[color][set];
 };

@@ -35,8 +35,6 @@ class Chessboard
 
 		};
 
-	private:
-
 		// Textures
 		SDL_Rect srcRect, destRect;
 

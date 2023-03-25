@@ -1,17 +1,17 @@
 #include "GameEngine.h"
 
-Game* game = nullptr;
+GameEngine* game = nullptr;
 
 int main(int argc, char* args[])
 {
 	// Timer
-	const int FPS = 60;
+	const int FPS = 120;
 	const int frameDelay = 1000 / FPS;    // (Time delay for one frame) = (1000)/(frames per second)
 	Uint32 frameStart;
 	int deltaTime;
 
 	// Game Initialising
-	game = new Game();
+	game = new GameEngine();
 	game->Init("Chess Game Project", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 640, false);
 
 	// Game Loop
