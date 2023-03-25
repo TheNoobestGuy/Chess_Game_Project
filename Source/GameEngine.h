@@ -1,8 +1,12 @@
 #pragma once
 
-#include <SDL.h>
+// Basic Libraries
 #include <stdio.h>
+
+// SDL Libraries
+#include <SDL.h>
 #include <SDL_image.h>
+
 class Game
 {
 	private:
