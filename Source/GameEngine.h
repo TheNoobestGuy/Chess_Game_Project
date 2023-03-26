@@ -13,7 +13,6 @@
 class GameEngine
 {
 	private:
-		int counter;
 		bool isRunning;
 		SDL_Window* window;
 
@@ -23,6 +22,7 @@ class GameEngine
 
 		void Init(const char* title, int x, int y, int width, int height, bool fullscreen);
 
+		void ObjectsInistializer();
 		void EventsHandler();
 		void Update();
 		void Render();

@@ -12,16 +12,18 @@ bool mouse_left_click_hold = false;
 
 // Picked figure
 bool picked = false;
-Figure* current_picked_pawn = nullptr;
+Figure* current_picked_figure = nullptr;
 
-// Chessboard
+// Chessboard Settings
+int set_of_figure = 0;
+int color_of_figure = 0;
 const int figures_number = 8;
 Chessboard* chessboard = nullptr;
 
 // Players figures
+Figure* figure = nullptr;
 Figure* white_player[figures_number];
 Figure* black_player[figures_number];
-Figure* figure = nullptr;
 
 // Renderer
 SDL_Renderer* GameEngine::renderer = nullptr;
@@ -82,22 +84,26 @@ void GameEngine::Init(const char* title, int x, int y, int width, int height, bo
 		isRunning = false;
 	}
 
-	// Objects inistializations
+	// Objects initializations
+	ObjectsInistializer();
+}
 
+void GameEngine::ObjectsInistializer()
+{
 	// Chessboard
 	chessboard = new Chessboard();
 
 	// White player figures
 	for (int i = 0; i < figures_number; i++)
 	{
-		figure = new Pawn(7, i+1, 0, 0);
+		figure = new Pawn(7, i + 1, set_of_figure, color_of_figure);
 		white_player[i] = figure;
 	}
 
 	// Black player figures
 	for (int i = 0; i < figures_number; i++)
 	{
-		figure = new Pawn(2, i+1, 0, 0);
+		figure = new Pawn(2, i + 1, set_of_figure, color_of_figure);
 		black_player[i] = figure;
 	}
 
@@ -120,6 +126,7 @@ void GameEngine::EventsHandler()
 		figures_collisions.push_back(white_player[i]->MouseColliding(mouse_x, mouse_y, white_player[i]->RectGetter()));
 	}
 
+	// Evenets switch handler
 	switch (event.type)
 	{
 	case SDL_QUIT:
@@ -139,15 +146,13 @@ void GameEngine::EventsHandler()
 	}
 
 	// Motion of figures
-	Figure* current_picked = nullptr;
-
 	for (int i = 0; i < figures_number; i++)
 	{
 		if (figures_collisions[i] && mouse_left_click_hold && !picked)
 		{
 			white_player[i]->InMotionSetter(true);
 
-			current_picked_pawn = white_player[i];
+			current_picked_figure = white_player[i];
 			picked = true;
 		}
 	}
@@ -160,26 +165,20 @@ void GameEngine::EventsHandler()
 			black_player[i]->InMotionSetter(false);
 		}
 
-		current_picked_pawn = nullptr;
+		current_picked_figure = nullptr;
 		picked = false;
 	}
 }
 
 void GameEngine::Update()
 {
-	white_player[0]->Update();
-	
-	// White player figures
-	for (Figure* figure : white_player)
+	// Figures Updates
+	for (int i = 0; i < figures_number; i++)
 	{
-		figure->Update();
+		white_player[i]->Update();
+		black_player[i]->Update();
 	}
 
-	// Black player figures
-	for (Figure* figure : black_player)
-	{
-		figure->Update();
-	}
 }
 
 void GameEngine::Render()
@@ -189,21 +188,16 @@ void GameEngine::Render()
 	// Chessboard
 	chessboard->DrawBoard();
 
-	// White player figures
-	for (Figure* figure : white_player)
+	// Figures Render
+	for (int i = 0; i < figures_number; i++)
 	{
-		figure->Render();
-	}
-
-	// Black player figures
-	for (Figure* figure : black_player)
-	{
-		figure->Render();
+		white_player[i]->Render();
+		black_player[i]->Render();
 	}
 
 	// Picked figure
-	if (picked && current_picked_pawn != nullptr)
-		current_picked_pawn->Render();
+	if (picked && current_picked_figure != nullptr)
+		current_picked_figure->Render();
 
 	SDL_RenderPresent(renderer);
 }
