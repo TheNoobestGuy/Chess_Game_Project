@@ -16,7 +16,6 @@ Chessboard::Chessboard()
 
 Chessboard::~Chessboard() {}
 
-
 void Chessboard::DrawBoard()
 {
 	for (int row = 0; row < 10; row++)

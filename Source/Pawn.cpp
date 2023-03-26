@@ -37,12 +37,6 @@ void Pawn::Render()
 			TextureMenager::Draw(fields_colors[0], srcRect, destRect);
 		else
 			TextureMenager::Draw(fields_colors[1], srcRect, destRect);
-
-		//  Highlight possible moves while picked up
-		for (std::tuple<SDL_Rect, SDL_Rect> field : possible_moves)
-		{
-			TextureMenager::Draw(numeric_tags[0], std::get<0>(field), std::get<1>(field));
-		}
 	}
 
 	TextureMenager::Draw(texture, srcRect, destRect);

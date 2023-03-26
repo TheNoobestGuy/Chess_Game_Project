@@ -18,13 +18,11 @@ class Figure : protected Chessboard
 		void InMotionSetter(bool in_motion);
 
 	protected:
+		bool in_motion;
 		int row_pos;
 		int column_pos;
 		int color;
 		int set;
-
-		std::vector<std::tuple<SDL_Rect, SDL_Rect>> possible_moves;
-		bool in_motion;
 
 		virtual void PossibleMoves() = 0;
 

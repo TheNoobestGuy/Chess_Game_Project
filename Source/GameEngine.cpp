@@ -12,33 +12,19 @@ bool mouse_left_click_hold = false;
 
 // Picked figure
 bool picked = false;
-Pawn* current_picked_pawn = nullptr;
+Figure* current_picked_pawn = nullptr;
+
+// Chessboard
+const int figures_number = 8;
+Chessboard* chessboard = nullptr;
+
+// Players figures
+Figure* white_player[figures_number];
+Figure* black_player[figures_number];
+Figure* figure = nullptr;
 
 // Renderer
 SDL_Renderer* GameEngine::renderer = nullptr;
-
-// Chessboard
-Chessboard* chessboard;
-
-// White player figures
-Pawn* white_pawn_1;
-Pawn* white_pawn_2;
-Pawn* white_pawn_3;
-Pawn* white_pawn_4;
-Pawn* white_pawn_5;
-Pawn* white_pawn_6;
-Pawn* white_pawn_7;
-Pawn* white_pawn_8;
-
-// Black player figures
-Pawn* black_pawn_1;
-Pawn* black_pawn_2;
-Pawn* black_pawn_3;
-Pawn* black_pawn_4;
-Pawn* black_pawn_5;
-Pawn* black_pawn_6;
-Pawn* black_pawn_7;
-Pawn* black_pawn_8;
 
 // Functions
 GameEngine::GameEngine()
@@ -89,35 +75,33 @@ void GameEngine::Init(const char* title, int x, int y, int width, int height, bo
 			printf("Window couldn't be created: %s\n", SDL_GetError());
 			isRunning = false;
 		}
-
-		// Chessboard
-		chessboard = new Chessboard();
-
-		// White player figures initialization
-		white_pawn_1 = new Pawn(7, 1, 0, 0);
-		white_pawn_2 = new Pawn(7, 2, 0, 0);
-		white_pawn_3 = new Pawn(7, 3, 0, 0);
-		white_pawn_4 = new Pawn(7, 4, 0, 0);
-		white_pawn_5 = new Pawn(7, 5, 0, 0);
-		white_pawn_6 = new Pawn(7, 6, 0, 0);
-		white_pawn_7 = new Pawn(7, 7, 0, 0);
-		white_pawn_8 = new Pawn(7, 8, 0, 0);
-
-		// Black player figures initialization
-		black_pawn_1 = new Pawn(2, 1, 1, 0);
-		black_pawn_2 = new Pawn(2, 2, 1, 0);
-		black_pawn_3 = new Pawn(2, 3, 1, 0);
-		black_pawn_4 = new Pawn(2, 4, 1, 0);
-		black_pawn_5 = new Pawn(2, 5, 1, 0);
-		black_pawn_6 = new Pawn(2, 6, 1, 0);
-		black_pawn_7 = new Pawn(2, 7, 1, 0);
-		black_pawn_8 = new Pawn(2, 8, 1, 0);
 	}
 	else
 	{
 		printf("Subsystem failed to initialise: %s\n", SDL_GetError());
 		isRunning = false;
 	}
+
+	// Objects inistializations
+
+	// Chessboard
+	chessboard = new Chessboard();
+
+	// White player figures
+	for (int i = 0; i < figures_number; i++)
+	{
+		figure = new Pawn(7, i+1, 0, 0);
+		white_player[i] = figure;
+	}
+
+	// Black player figures
+	for (int i = 0; i < figures_number; i++)
+	{
+		figure = new Pawn(2, i+1, 0, 0);
+		black_player[i] = figure;
+	}
+
+	figure = nullptr;
 }
 
 void GameEngine::EventsHandler()
@@ -128,27 +112,18 @@ void GameEngine::EventsHandler()
 	// Mouse position
 	SDL_GetMouseState(&mouse_x, &mouse_y);
 
-	// Collisions
-	bool figures_collisions[8] =
+	// Collisions with mouse
+	std::vector<bool> figures_collisions;
+
+	for (int i = 0; i < figures_number; i++)
 	{
-		white_pawn_1->MouseColliding(mouse_x, mouse_y, white_pawn_1->RectGetter()),
-		white_pawn_2->MouseColliding(mouse_x, mouse_y, white_pawn_2->RectGetter()),
-		white_pawn_3->MouseColliding(mouse_x, mouse_y, white_pawn_3->RectGetter()),
-		white_pawn_4->MouseColliding(mouse_x, mouse_y, white_pawn_4->RectGetter()),
-		white_pawn_5->MouseColliding(mouse_x, mouse_y, white_pawn_5->RectGetter()),
-		white_pawn_6->MouseColliding(mouse_x, mouse_y, white_pawn_6->RectGetter()),
-		white_pawn_7->MouseColliding(mouse_x, mouse_y, white_pawn_7->RectGetter()),
-		white_pawn_8->MouseColliding(mouse_x, mouse_y, white_pawn_8->RectGetter())
-	};
+		figures_collisions.push_back(white_player[i]->MouseColliding(mouse_x, mouse_y, white_player[i]->RectGetter()));
+	}
 
 	switch (event.type)
 	{
 	case SDL_QUIT:
 		isRunning = false;
-		break;
-
-	case SDL_MOUSEMOTION:
-		std::cout << "Mouse coord: " << mouse_x << ", " << mouse_y << std::endl;
 		break;
 
 	case SDL_MOUSEBUTTONDOWN:
@@ -166,17 +141,24 @@ void GameEngine::EventsHandler()
 	// Motion of figures
 	Figure* current_picked = nullptr;
 
-	if (figures_collisions[0] && mouse_left_click_hold)
+	for (int i = 0; i < figures_number; i++)
 	{
-		white_pawn_1->InMotionSetter(true);
+		if (figures_collisions[i] && mouse_left_click_hold && !picked)
+		{
+			white_player[i]->InMotionSetter(true);
 
-		current_picked_pawn = white_pawn_1;
-		picked = true;
+			current_picked_pawn = white_player[i];
+			picked = true;
+		}
 	}
 
 	if (!mouse_left_click_hold)
 	{
-		white_pawn_1->InMotionSetter(false);
+		for (int i = 0; i < figures_number; i++)
+		{
+			white_player[i]->InMotionSetter(false);
+			black_player[i]->InMotionSetter(false);
+		}
 
 		current_picked_pawn = nullptr;
 		picked = false;
@@ -185,54 +167,41 @@ void GameEngine::EventsHandler()
 
 void GameEngine::Update()
 {
+	white_player[0]->Update();
+	
 	// White player figures
-	white_pawn_1->Update();
-	white_pawn_2->Update();
-	white_pawn_3->Update();
-	white_pawn_4->Update();
-	white_pawn_5->Update();
-	white_pawn_6->Update();
-	white_pawn_7->Update();
-	white_pawn_8->Update();
+	for (Figure* figure : white_player)
+	{
+		figure->Update();
+	}
 
 	// Black player figures
-	black_pawn_1->Update();
-	black_pawn_2->Update();
-	black_pawn_3->Update();
-	black_pawn_4->Update();
-	black_pawn_5->Update();
-	black_pawn_6->Update();
-	black_pawn_7->Update();
-	black_pawn_8->Update();
+	for (Figure* figure : black_player)
+	{
+		figure->Update();
+	}
 }
 
 void GameEngine::Render()
 {
 	SDL_RenderClear(renderer);
 
+	// Chessboard
 	chessboard->DrawBoard();
 
 	// White player figures
-	white_pawn_1->Render();
-	white_pawn_2->Render();
-	white_pawn_3->Render();
-	white_pawn_4->Render();
-	white_pawn_5->Render();
-	white_pawn_6->Render();
-	white_pawn_7->Render();
-	white_pawn_8->Render();
+	for (Figure* figure : white_player)
+	{
+		figure->Render();
+	}
 
 	// Black player figures
-	black_pawn_1->Render();
-	black_pawn_2->Render();
-	black_pawn_3->Render();
-	black_pawn_4->Render();
-	black_pawn_5->Render();
-	black_pawn_6->Render();
-	black_pawn_7->Render();
-	black_pawn_8->Render();
+	for (Figure* figure : black_player)
+	{
+		figure->Render();
+	}
 
-	// Current picked object
+	// Picked figure
 	if (picked && current_picked_pawn != nullptr)
 		current_picked_pawn->Render();
 
@@ -247,12 +216,6 @@ void GameEngine::Clean()
 	printf("Game Successfully Closed!\n");
 }
 
-int GameEngine::GetMouseX()
-{
-	return mouse_x;
-}
+int GameEngine::GetMouseX() { return mouse_x; }
 
-int GameEngine::GetMouseY()
-{
-	return mouse_y;
-}
+int GameEngine::GetMouseY() { return mouse_y; }
