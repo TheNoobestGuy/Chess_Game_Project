@@ -4,21 +4,7 @@
 
 void Pawn::PossibleMoves()
 {
-	// Possible move
-	SDL_Rect move_variant_src;
-	SDL_Rect move_variant_dest;
 
-	// Source size and position of image
-	move_variant_src.w = 64;
-	move_variant_src.h = 64;
-	move_variant_src.x = move_variant_src.y = 0;
-
-	// Desired size of image
-	move_variant_dest.w = move_variant_dest.h = 64;
-	move_variant_dest.x = column_pos * 64;
-	move_variant_dest.y = (row_pos - 1) * 64;
-
-	possible_moves.push_back(std::tuple<SDL_Rect, SDL_Rect> (move_variant_src, move_variant_dest));
 }
 
 void Pawn::Update()
