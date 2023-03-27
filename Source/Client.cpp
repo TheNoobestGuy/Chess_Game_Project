@@ -13,6 +13,10 @@ int main(int argc, char* args[])
 	// Game Initialising
 	game = new GameEngine();
 	game->Init("Chess Game Project", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 640, false);
+	game->ObjectsInistializer();
+
+	// Mouse properties
+
 
 	// Game Loop
 	while (game->Running())
@@ -23,6 +27,7 @@ int main(int argc, char* args[])
 		game->EventsHandler();
 		game->Update();
 		game->Render();
+		game->MouseTracer();
 
 		deltaTime = SDL_GetTicks() - frameStart;
 

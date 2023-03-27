@@ -5,11 +5,10 @@
 class Pawn : public Figure
 {
 	public:
-		// Inheritance of constructor
-		using Figure::Figure;
+		Pawn(int row_pos, int column_pos, int color, int set);
+		~Pawn();
 
 		// Inheritance of functions
-		using Figure::MouseColliding;
 		using Figure::InMotionSetter;
 		using Figure::RectGetter;
 
@@ -17,8 +16,8 @@ class Pawn : public Figure
 		void Render();
 
 	private:
-		void PossibleMoves();
+		int available_move;
 
-		SDL_Texture* texture = pawns_textures[color][set];
+		SDL_Texture* texture;
 };
 

@@ -5,7 +5,7 @@
 
 struct Field
 {
-	int figure;
+	bool figure;
 	char texture;
 };
 

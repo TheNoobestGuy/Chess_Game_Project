@@ -138,7 +138,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Source\Pawn.cpp" />
-    <ClCompile Include="Source\Figure.cpp" />
     <ClCompile Include="Source\Chessboard.cpp" />
     <ClCompile Include="Source\Client.cpp" />
     <ClCompile Include="Source\GameEngine.cpp" />
@@ -158,9 +157,37 @@
     <None Include="SDL2_image.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="Textures\Chessboard\1.png" />
+    <Image Include="Textures\Chessboard\2.png" />
+    <Image Include="Textures\Chessboard\3.png" />
+    <Image Include="Textures\Chessboard\4.png" />
+    <Image Include="Textures\Chessboard\5.png" />
+    <Image Include="Textures\Chessboard\6.png" />
+    <Image Include="Textures\Chessboard\7.png" />
+    <Image Include="Textures\Chessboard\8.png" />
+    <Image Include="Textures\Chessboard\9.png" />
+    <Image Include="Textures\Chessboard\A.png" />
+    <Image Include="Textures\Chessboard\B.png" />
     <Image Include="Textures\Chessboard\blackSqr.png" />
+    <Image Include="Textures\Chessboard\C.png" />
+    <Image Include="Textures\Chessboard\D.png" />
+    <Image Include="Textures\Chessboard\E.png" />
+    <Image Include="Textures\Chessboard\F.png" />
+    <Image Include="Textures\Chessboard\G.png" />
+    <Image Include="Textures\Chessboard\H.png" />
     <Image Include="Textures\Chessboard\whiteSqr.png" />
-    <Image Include="Textures\Figures\pawn.png" />
+    <Image Include="Textures\Figures\black_bishop.png" />
+    <Image Include="Textures\Figures\black_king.png" />
+    <Image Include="Textures\Figures\black_knight.png" />
+    <Image Include="Textures\Figures\black_pawn.png" />
+    <Image Include="Textures\Figures\black_queen.png" />
+    <Image Include="Textures\Figures\black_rook.png" />
+    <Image Include="Textures\Figures\white_bishop.png" />
+    <Image Include="Textures\Figures\white_king.png" />
+    <Image Include="Textures\Figures\white_knight.png" />
+    <Image Include="Textures\Figures\white_pawn.png" />
+    <Image Include="Textures\Figures\white_queen.png" />
+    <Image Include="Textures\Figures\white_rook.png" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="Libraries\SDL2_Image\lib\x64\SDL2_image.lib" />

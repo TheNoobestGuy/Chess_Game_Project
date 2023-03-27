@@ -1,17 +1,8 @@
-#include "GameEngine.h"
 #include "Chessboard.h"
-
-#include <iostream>
 
 Chessboard::Chessboard() 
 {
-	// Source size of image
-	srcRect.w = srcRect.h = 64;
-	srcRect.x = srcRect.y = 0;
-
-	// Desired size of image
-	destRect.w = destRect.h = 64;
-	destRect.x = destRect.y = 0;
+	GameEngine::RectangleHandler(&srcRect, &destRect, 64, 64);
 }
 
 Chessboard::~Chessboard() {}

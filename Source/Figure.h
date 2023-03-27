@@ -1,38 +1,42 @@
 #pragma once
 
-#include "TextureMenager.h"
 #include "Chessboard.h"
 
 class Figure : protected Chessboard
 {
 	public:
-		Figure(int row_pos, int column_pos, int color, int set);
-		~Figure();
+		Figure() {};
+		~Figure() {};
 
 		virtual void Update() = 0;
 		virtual void Render() = 0;
-
-		bool MouseColliding(int mouse_x, int mouse_y, SDL_Rect Rect);
-		SDL_Rect RectGetter();
-
-		void InMotionSetter(bool in_motion);
+		
+		// Properties
+		SDL_Rect* RectGetter() { return &destRect; }
+		void InMotionSetter(bool in_motion) { this->in_motion = in_motion; };
 
 	protected:
-		bool in_motion;
+		// Attributes
 		int row_pos;
 		int column_pos;
 		int color;
 		int set;
 
-		virtual void PossibleMoves() = 0;
+		bool in_motion;
+		bool picked_up;
+		bool putted_back;
+
+		// Move handler
+		std::vector<std::tuple<int, int, SDL_Rect>> possible_moves;
+		std::stack<std::tuple<int, int, SDL_Rect>> move;
 
 		// Textures
 		SDL_Rect srcRect, destRect;
 
 		SDL_Texture* pawns_textures[2][1] =
 		{
-			{ TextureMenager::LoadTexture("Textures/Figures/pawn.png") },
-			{ TextureMenager::LoadTexture("Textures/Figures/pawn.png") }
+			{ TextureMenager::LoadTexture("Textures/Figures/white_pawn.png") },
+			{ TextureMenager::LoadTexture("Textures/Figures/black_pawn.png") }
 		};
 
 };
