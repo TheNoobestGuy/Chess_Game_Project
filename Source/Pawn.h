@@ -4,20 +4,22 @@
 
 class Pawn : public Figure
 {
-	public:
-		Pawn(int row_pos, int column_pos, int color, int set);
-		~Pawn();
-
-		// Inheritance of functions
-		using Figure::InMotionSetter;
-		using Figure::RectGetter;
-
-		void Update();
-		void Render();
-
 	private:
-		int available_move;
+		Field_ID moves_list[2][1] =
+		{
+			{ { 0, -1} },
+			{ { 0,  1} }
+		};
 
-		SDL_Texture* texture;
+		Field_ID attacks_list[2][2] =
+		{
+			{ {-1, -1}, { 1, -1} },
+			{ {-1,  1}, { 1,  1} }
+		};
+
+	public:
+		using Figure::Figure;
+
+		void AvailableMoves();
 };
 

@@ -1,43 +1,65 @@
 #pragma once
 
-#include "Chessboard.h"
+#include "GameEngine.h"
 
-class Figure : protected Chessboard
+struct Field_ID
 {
-	public:
-		Figure() {};
-		~Figure() {};
+	int row;
+	int col;
+};
 
-		virtual void Update() = 0;
-		virtual void Render() = 0;
-		
-		// Properties
-		SDL_Rect* RectGetter() { return &destRect; }
-		void InMotionSetter(bool in_motion) { this->in_motion = in_motion; };
-
+class Figure
+{
 	protected:
-		// Attributes
-		int row_pos;
-		int column_pos;
-		int color;
-		int set;
+		Field_ID field_ID;
+		bool color;
+		int size;
 
-		bool in_motion;
+		// Pick up
+		static bool FigurePickedUp;
 		bool picked_up;
-		bool putted_back;
 
-		// Move handler
-		std::vector<std::tuple<int, int, SDL_Rect>> possible_moves;
-		std::stack<std::tuple<int, int, SDL_Rect>> move;
+		// Collisions
+		SDL_Rect figure_rect;
+		SDL_Rect motion_rect;
 
-		// Textures
-		SDL_Rect srcRect, destRect;
+	public:
+		Figure(Field_ID field_ID, bool color, int size);
+		~Figure();
 
-		SDL_Texture* pawns_textures[2][1] =
+		// Possible plays
+		std::vector<Field_ID> available_moves;
+
+		// Figure features
+		virtual void AvailableMoves() = 0;
+		void ChangePosition(Field_ID field_ID);
+		void PickUp();
+
+		// Base functions
+		void Update();
+		void Render();
+
+		// Properties
+		Field_ID GetFieldID() { return field_ID; }
+		bool GetColor() { return color; }
+
+		SDL_Rect* GetMotionRect() { return &motion_rect;  }
+		bool PickedUp() { return picked_up; }
+
+		// ****************** TEST ******************
+		void Delete();
+
+// ****************** TEST TEXTURES ******************
+		struct Texture
+		{
+			SDL_Texture* texture;
+			SDL_Rect srcRect = GameEngine::CreateRectangle(0, 0, 64);
+		};
+
+		Texture pawns_textures[2] =
 		{
 			{ TextureMenager::LoadTexture("Textures/Figures/white_pawn.png") },
 			{ TextureMenager::LoadTexture("Textures/Figures/black_pawn.png") }
 		};
-
 };
 

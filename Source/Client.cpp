@@ -1,6 +1,8 @@
 #include "GameEngine.h"
+#include "Chessboard.h"
 
-GameEngine* game = nullptr;
+GameEngine* game_engine = nullptr;
+Chessboard* chessboard = nullptr;
 
 int main(int argc, char* args[])
 {
@@ -11,23 +13,26 @@ int main(int argc, char* args[])
 	int deltaTime;
 
 	// Game Initialising
-	game = new GameEngine();
-	game->Init("Chess Game Project", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 640, false);
-	game->ObjectsInistializer();
+	game_engine = new GameEngine();
+	game_engine->Init("Chess Game Project", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 640, false);
 
-	// Mouse properties
-
+	// Chessboard
+	chessboard = new Chessboard(64);
+	chessboard->CreateBoard();
+	chessboard->CreateFigures();
 
 	// Game Loop
-	while (game->Running())
+	while (game_engine->Running())
 	{
 		frameStart = SDL_GetTicks();
 
-		// Engine Functions
-		game->EventsHandler();
-		game->Update();
-		game->Render();
-		game->MouseTracer();
+		// Game engine features
+		game_engine->EventHandler();
+
+		// Chessboard
+		chessboard->UpdateFigures();
+		chessboard->RenderFigures();
+		chessboard->BoardTracer();
 
 		deltaTime = SDL_GetTicks() - frameStart;
 
@@ -38,7 +43,7 @@ int main(int argc, char* args[])
 		}
 	}
 	
-	game->Clean();
+	game_engine->Clean();
 
 	return 0;
 }

@@ -138,17 +138,18 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Source\Pawn.cpp" />
+    <ClCompile Include="Source\Figure.cpp" />
+    <ClCompile Include="Source\GameEngine.cpp" />
     <ClCompile Include="Source\Chessboard.cpp" />
     <ClCompile Include="Source\Client.cpp" />
-    <ClCompile Include="Source\GameEngine.cpp" />
     <ClCompile Include="Source\TextureMenager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Pawn.h" />
     <ClInclude Include="Source\Figure.h" />
+    <ClInclude Include="Source\GameEngine.h" />
     <ClInclude Include="Libraries\SDL2_Image\include\SDL_image.h" />
     <ClInclude Include="Source\Chessboard.h" />
-    <ClInclude Include="Source\GameEngine.h" />
     <ClInclude Include="Source\TextureMenager.h" />
   </ItemGroup>
   <ItemGroup>

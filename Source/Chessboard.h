@@ -1,47 +1,67 @@
 #pragma once
 
 #include "GameEngine.h"
-#include "TextureMenager.h"
+#include "Pawn.h"
 
 struct Field
 {
-	bool figure;
-	char texture;
+	Field_ID field_ID;
+	int field_size;
+	bool color;
+
+	Figure* figure;
+	SDL_Rect field_rect = GameEngine::CreateRectangle(field_ID.row, field_ID.col, field_size);
 };
 
 class Chessboard
 {
+	private:
+		int player;
+		int fields_size;
+
+		bool make_move;
+		Field_ID move_to;
+		bool moved_figure;
+
+		Field chessboard[8][8];
+
+		Figure* current_figure;
+		Figure* white_player[8];
+		Figure* black_player[8];
+
 	public:
-		Chessboard();
-		~Chessboard();	
+		Chessboard(int fields_size);
+		~Chessboard();
 
+		// Create objects
+		void CreateBoard();
+		void CreateFigures();
+
+		// Board features
 		void DrawBoard();
+		void DrawFigures();
+		void SwitchTurns();
+		void BoardTracer();
+		void UpdateFigures();
+		void RenderFigures();
 
-	protected:
+		// Figures features
+		void MoveFigure();
+		void PickedUpFigure();
 
-		Field chessboard[10][10] =
+
+// ****************** TEST TEXTURES ******************
+	private:
+		struct Texture
 		{
-
-					{ { 0, 0}, { 0, 'H'}, { 0, 'G'}, { 0, 'F'}, { 0, 'E'}, { 0, 'D'}, { 0, 'C'}, { 0, 'B'}, { 0, 'A'}, { 0, 0} },
-					{ { 0, 1}, { 0, 'X'}, { 0, 'O'}, { 0, 'X'}, { 0, 'O'}, { 0, 'X'}, { 0, 'O'}, { 0, 'X'}, { 0, 'O'}, { 0, 8} },
-					{ { 0, 2}, { 0, 'O'}, { 0, 'X'}, { 0, 'O'}, { 0, 'X'}, { 0, 'O'}, { 0, 'X'}, { 0, 'O'}, { 0, 'X'}, { 0, 7} },
-					{ { 0, 3}, { 0, 'X'}, { 0, 'O'}, { 0, 'X'}, { 0, 'O'}, { 0, 'X'}, { 0, 'O'}, { 0, 'X'}, { 0, 'O'}, { 0, 6} },
-					{ { 0, 4}, { 0, 'O'}, { 0, 'X'}, { 0, 'O'}, { 0, 'X'}, { 0, 'O'}, { 0, 'X'}, { 0, 'O'}, { 0, 'X'}, { 0, 5} },
-					{ { 0, 5}, { 0, 'X'}, { 0, 'O'}, { 0, 'X'}, { 0, 'O'}, { 0, 'X'}, { 0, 'O'}, { 0, 'X'}, { 0, 'O'}, { 0, 4} },
-					{ { 0, 6}, { 0, 'O'}, { 0, 'X'}, { 0, 'O'}, { 0, 'X'}, { 0, 'O'}, { 0, 'X'}, { 0, 'O'}, { 0, 'X'}, { 0, 3} },
-					{ { 0, 7}, { 0, 'X'}, { 0, 'O'}, { 0, 'X'}, { 0, 'O'}, { 0, 'X'}, { 0, 'O'}, { 0, 'X'}, { 0, 'O'}, { 0, 2} },
-					{ { 0, 8}, { 0, 'O'}, { 0, 'X'}, { 0, 'O'}, { 0, 'X'}, { 0, 'O'}, { 0, 'X'}, { 0, 'O'}, { 0, 'X'}, { 0, 1} },
-					{ { 0, 0}, { 0, 'A'}, { 0, 'B'}, { 0, 'C'}, { 0, 'D'}, { 0, 'E'}, { 0, 'F'}, { 0, 'G'}, { 0, 'H'}, { 0, 0} }
-
+			SDL_Texture* texture;
+			SDL_Rect srcRect = GameEngine::CreateRectangle(0, 0, 64);
 		};
 
-		// Textures
-		SDL_Rect srcRect, destRect;
-
-		SDL_Texture* fields_colors[2] =
+		Texture fields_colors[2] =
 		{
-			TextureMenager::LoadTexture("Textures/Chessboard/whiteSqr.png"),
-			TextureMenager::LoadTexture("Textures/Chessboard/blackSqr.png")
+			{ TextureMenager::LoadTexture("Textures/Chessboard/whiteSqr.png") },
+			{ TextureMenager::LoadTexture("Textures/Chessboard/blackSqr.png") }
 		};
 
 		SDL_Texture* numeric_tags[8] =
@@ -67,5 +87,5 @@ class Chessboard
 			TextureMenager::LoadTexture("Textures/Chessboard/G.png"),
 			TextureMenager::LoadTexture("Textures/Chessboard/H.png")
 		};
-
+		// TEST
 };
