@@ -152,7 +152,7 @@ void Chessboard::MoveFigure()
 {
 	if (current_figure != nullptr)
 	{
-		// Check for collision
+		// Check for collision with board fields while figure raised up
 		if (current_figure->PickedUp())
 		{
 			for (int move = 0; move < current_figure->available_moves.size(); move++)
@@ -183,13 +183,14 @@ void Chessboard::MoveFigure()
 			}
 		}
 
-		// Send new field ID to figure and check is there any collision with some other figures
+		// Send new field ID to figure and check if is there any collision with some other figures
 		if (make_move && !current_figure->PickedUp())
 		{
-			// Attack
-			if (chessboard[move_to.y][move_to.x]->occupied && chessboard[move_to.y][move_to.x]->figure_color != current_figure->GetColor())
+
+			std::cout << current_figure->EnPassantBeating() << std::endl;
+			// Attack								(Delete figure from attacking field)																(En passant condition)						
+			if ((chessboard[move_to.y][move_to.x]->occupied && chessboard[move_to.y][move_to.x]->figure_color != current_figure->GetColor()) || (current_figure->EnPassantBeating() != 0))
 			{
-				// Delete figure from attacking field
 				if (current_figure->GetColor() == 0)
 				{
 					for (Figure* figure : black_player)
@@ -212,19 +213,26 @@ void Chessboard::MoveFigure()
 						}
 					}
 				}
-
-				// Make move
-				current_figure->ChangePosition(move_to);
-				update_board = true;
-				make_move = false;
 			}
-			// Make move to free field
-			else if (!chessboard[move_to.y][move_to.x]->occupied)
+			
+			// Hold information about pawn move for possible en passant
+			if (current_figure->IsItFirstMove())
 			{
-				current_figure->ChangePosition(move_to);
-				update_board = true;
-				make_move = false;
+				if (current_figure->GetFigureID() <= 8)
+				{
+					int double_move = current_figure->GetFieldID().y - current_figure->available_moves.back().y;
+
+					if (double_move == 2 || double_move == -2)
+					{
+						chessboard[current_figure->available_moves.back().y][current_figure->available_moves.back().x]->en_passant = true;
+					}
+				}
 			}
+
+			// Make move
+			current_figure->ChangePosition(move_to);
+			update_board = true;
+			make_move = false;
 
 			current_figure = nullptr;
 		}

@@ -45,7 +45,29 @@ void Pawn::AvailableMoves(Field* chessboard[8][8])
 		}
 
 		// En passant
+		for (int en_passant = 0; en_passant < 2; en_passant++)
+		{
+			int en_passant_x = field_ID.x + attacks_list[2][en_passant].x;
+			int en_passant_y = field_ID.y + attacks_list[2][en_passant].y;
 
+			if ((en_passant_x >= 0 && en_passant_x < 8) && (en_passant_y >= 0 && en_passant_y < 8))
+			{
+				if (chessboard[en_passant_y][en_passant_x]->occupied && chessboard[en_passant_y][en_passant_x]->figure_color != this->color)
+				{
+					if (chessboard[en_passant_y][en_passant_x]->en_passant)
+					{
+
+						// ??????????????????????????????????????????????????????????????????
+						en_passant_x = field_ID.x + attacks_list[color][en_passant].x;
+						en_passant_y = field_ID.y + attacks_list[color][en_passant].y;
+
+						available_moves.push_back({ en_passant_x, en_passant_y });
+					}
+				}
+			}
+		}
+
+		chessboard[field_ID.y][field_ID.x]->en_passant = false;
 	}
 }
 

@@ -7,6 +7,7 @@ Figure::Figure(int ID, Field_ID field_ID, bool color, int size)
 	this->color = color;
 	this->size = size;
 
+	this->en_passant_attack = 0;
 	this->first_move = true;
 	this->picked_up = false;
 
@@ -50,10 +51,6 @@ void Figure::PickUp()
 		motion_rect.y = GameEngine::mouse_y - (size / 2);
 	}
 }
-
-// Pure virtual
-void Figure::AvailableMoves(Field* chessboard[8][8]) {}
-
 
 // ****************** TEST ******************
 void Figure::Delete()

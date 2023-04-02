@@ -10,7 +10,7 @@ class King : public Figure
 		Field_ID moves_list[8] =
 		{
 			//         Straight axis										  Curve axis
-			 { 0, -1}, { 0, 1}, { -1, 0}, { 1, 0},				{ -1, -1}, { 1, -1}, { 1, 1}, { -1, 1}
+			{ 0, -1}, { 0, 1}, { -1, 0}, { 1, 0},				{ -1, -1}, { 1, -1}, { 1, 1}, { -1, 1}
 		};
 
 		Texture king_textures[2] =

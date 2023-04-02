@@ -10,7 +10,7 @@ class Bishop : public Figure
 		Field_ID moves_list[4] =
 		{
 			//             Curve axis
-			 { -1, -1}, { 1, -1}, { 1, 1}, { -1, 1}
+			{ -1, -1}, { 1, -1}, { 1, 1}, { -1, 1}
 		};
 
 		Texture bishop_textures[2] =

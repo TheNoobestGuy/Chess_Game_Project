@@ -14,6 +14,7 @@ class Figure
 
 		// Movement
 		static bool FigurePickedUp;
+		int en_passant_attack;
 		bool first_move;
 		bool picked_up;
 
@@ -41,6 +42,8 @@ class Figure
 		Field_ID GetFieldID() { return field_ID; }
 
 		bool GetColor() { return color; }
+		bool IsItFirstMove() { return first_move; }
+		int EnPassantBeating() { return en_passant_attack; }
 
 		SDL_Rect* GetMotionRect() { return &motion_rect;  }
 		bool PickedUp() { return picked_up; }

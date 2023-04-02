@@ -8,7 +8,7 @@ class Knight : public Figure
 		Field_ID moves_list[8] =
 		{
 			//				 X axis									     Y axis				
-			 { -2, -1}, { -2, 1}, { 2, -1}, { 2, 1},    { -1, -2}, { 1, -2}, { 1, 2}, { -1, 2},
+			{ -2, -1}, { -2, 1}, { 2, -1}, { 2, 1},    { -1, -2}, { 1, -2}, { 1, 2}, { -1, 2},
 		};
 
 		Texture knight_textures[2] =

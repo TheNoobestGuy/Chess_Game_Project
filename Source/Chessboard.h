@@ -54,9 +54,6 @@ class Chessboard
 
 // ****************** TEST TEXTURES ******************
 	private:
-
-		bool test = true;
-
 		Texture fields_colors[2] =
 		{
 			{ TextureMenager::LoadTexture("Textures/Chessboard/whiteSqr.png") },

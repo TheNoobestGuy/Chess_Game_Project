@@ -63,6 +63,9 @@ struct Field
 	bool figure_color;
 	bool occupied;
 
+	// En passant possible
+	bool en_passant = false;
+
 	// Rectangle
 	SDL_Rect field_rect = GameEngine::CreateRectangle(field_ID.x, field_ID.y, field_size);
 };
