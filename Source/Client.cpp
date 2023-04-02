@@ -14,7 +14,7 @@ int main(int argc, char* args[])
 
 	// Game Initialising
 	game_engine = new GameEngine();
-	game_engine->Init("Chess Game Project", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 640, false);
+	game_engine->Init("Chess Game Project", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 512, 512, false);
 
 	// Chessboard
 	chessboard = new Chessboard(64);
@@ -30,9 +30,11 @@ int main(int argc, char* args[])
 		game_engine->EventHandler();
 
 		// Chessboard
+		chessboard->BoardUpdate();
 		chessboard->UpdateFigures();
 		chessboard->RenderFigures();
-		chessboard->BoardTracer();
+		chessboard->SwitchTurns();
+		
 
 		deltaTime = SDL_GetTicks() - frameStart;
 

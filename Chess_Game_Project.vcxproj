@@ -137,6 +137,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Bishop.cpp" />
+    <ClCompile Include="Source\King.cpp" />
+    <ClCompile Include="Source\Knight.cpp" />
+    <ClCompile Include="Source\Queen.cpp" />
+    <ClCompile Include="Source\Rook.cpp" />
     <ClCompile Include="Source\Pawn.cpp" />
     <ClCompile Include="Source\Figure.cpp" />
     <ClCompile Include="Source\GameEngine.cpp" />
@@ -145,6 +150,11 @@
     <ClCompile Include="Source\TextureMenager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Bishop.h" />
+    <ClInclude Include="Source\King.h" />
+    <ClInclude Include="Source\Knight.h" />
+    <ClInclude Include="Source\Queen.h" />
+    <ClInclude Include="Source\Rook.h" />
     <ClInclude Include="Source\Pawn.h" />
     <ClInclude Include="Source\Figure.h" />
     <ClInclude Include="Source\GameEngine.h" />

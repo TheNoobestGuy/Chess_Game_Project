@@ -2,21 +2,19 @@
 
 #include "GameEngine.h"
 
-struct Field_ID
-{
-	int row;
-	int col;
-};
-
 class Figure
 {
 	protected:
+		// Properties
+		int ID;
 		Field_ID field_ID;
-		bool color;
+		int color;
 		int size;
+		SDL_Texture* texture;
 
-		// Pick up
+		// Movement
 		static bool FigurePickedUp;
+		bool first_move;
 		bool picked_up;
 
 		// Collisions
@@ -24,23 +22,24 @@ class Figure
 		SDL_Rect motion_rect;
 
 	public:
-		Figure(Field_ID field_ID, bool color, int size);
+		Figure(int figure_ID, Field_ID field_ID, bool color, int size);
 		~Figure();
 
 		// Possible plays
 		std::vector<Field_ID> available_moves;
 
 		// Figure features
-		virtual void AvailableMoves() = 0;
+		virtual void AvailableMoves(Field* chessboard[8][8]) = 0;
 		void ChangePosition(Field_ID field_ID);
 		void PickUp();
 
-		// Base functions
-		void Update();
-		void Render();
+		// Draw function
+		virtual void Render() = 0;
 
 		// Properties
+		int GetFigureID() { return ID; }
 		Field_ID GetFieldID() { return field_ID; }
+
 		bool GetColor() { return color; }
 
 		SDL_Rect* GetMotionRect() { return &motion_rect;  }
@@ -48,18 +47,4 @@ class Figure
 
 		// ****************** TEST ******************
 		void Delete();
-
-// ****************** TEST TEXTURES ******************
-		struct Texture
-		{
-			SDL_Texture* texture;
-			SDL_Rect srcRect = GameEngine::CreateRectangle(0, 0, 64);
-		};
-
-		Texture pawns_textures[2] =
-		{
-			{ TextureMenager::LoadTexture("Textures/Figures/white_pawn.png") },
-			{ TextureMenager::LoadTexture("Textures/Figures/black_pawn.png") }
-		};
 };
-

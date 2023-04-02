@@ -1,14 +1,16 @@
 #include "Figure.h"
 
-Figure::Figure(Field_ID field_ID, bool color, int size)
+Figure::Figure(int ID, Field_ID field_ID, bool color, int size)
 {
+	this->ID = ID;
 	this->field_ID = field_ID;
 	this->color = color;
 	this->size = size;
 
+	this->first_move = true;
 	this->picked_up = false;
 
-	this->figure_rect = GameEngine::CreateRectangle(field_ID.row, field_ID.col, size);
+	this->figure_rect = GameEngine::CreateRectangle(field_ID.x, field_ID.y, size);
 	this->motion_rect = GameEngine::CreateRectangle(0, 0, size);
 }
 
@@ -16,13 +18,17 @@ Figure::~Figure() {}
 
 bool Figure::FigurePickedUp = false;
 
-
 void Figure::ChangePosition(Field_ID field_ID)
 {
 	this->field_ID = field_ID;
 
-	figure_rect.x = field_ID.row * size;
-	figure_rect.y = field_ID.col * size;
+	figure_rect.x = field_ID.x * size;
+	figure_rect.y = field_ID.y * size;
+
+	if (this->first_move)
+	{
+		this->first_move = false;
+	}
 }
 
 void Figure::PickUp()
@@ -45,22 +51,8 @@ void Figure::PickUp()
 	}
 }
 
-void Figure::Update()
-{
-	AvailableMoves();
-	PickUp();
-}
-
-void Figure::Render()
-{
-	if (picked_up)
-		TextureMenager::Draw(pawns_textures[color].texture, pawns_textures[color].srcRect, motion_rect);
-	else
-		TextureMenager::Draw(pawns_textures[color].texture, pawns_textures[color].srcRect, figure_rect);
-}
-
 // Pure virtual
-void Figure::AvailableMoves() {}
+void Figure::AvailableMoves(Field* chessboard[8][8]) {}
 
 
 // ****************** TEST ******************

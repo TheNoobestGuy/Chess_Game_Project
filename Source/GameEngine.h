@@ -4,6 +4,7 @@
 #include <iostream>
 #include <stdio.h>
 #include <vector>
+#include <string>
 #include <stack>
 
 // SDL Libraries
@@ -42,3 +43,32 @@ class GameEngine
 		bool Running() { return isRunning; }
 };
 
+// Structs
+
+struct Field_ID
+{
+	int x;
+	int y;
+};
+
+struct Field
+{
+	// Field proporties
+	Field_ID field_ID;
+	int field_size;
+	int color;
+
+	// Figure on field
+	int figure_ID;
+	bool figure_color;
+	bool occupied;
+
+	// Rectangle
+	SDL_Rect field_rect = GameEngine::CreateRectangle(field_ID.x, field_ID.y, field_size);
+};
+
+struct Texture
+{
+	SDL_Texture* texture;
+	SDL_Rect srcRect = GameEngine::CreateRectangle(0, 0, 64);
+};

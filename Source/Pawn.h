@@ -5,21 +5,35 @@
 class Pawn : public Figure
 {
 	private:
-		Field_ID moves_list[2][1] =
+		Field_ID moves_list[2][2] =
 		{
-			{ { 0, -1} },
-			{ { 0,  1} }
+			// White pawn
+			{ { 0, -1}, { 0, -2}},
+
+			// Black pawn
+			{ { 0,  1}, { 0,  2}}
 		};
 
 		Field_ID attacks_list[2][2] =
 		{
+			// White pawn
 			{ {-1, -1}, { 1, -1} },
+
+			// Black pawn
 			{ {-1,  1}, { 1,  1} }
+		};
+
+		Texture pawns_textures[2] =
+		{
+			{ TextureMenager::LoadTexture("Textures/Figures/white_pawn.png") },
+			{ TextureMenager::LoadTexture("Textures/Figures/black_pawn.png") }
 		};
 
 	public:
 		using Figure::Figure;
 
-		void AvailableMoves();
+		void AvailableMoves(Field* chessboard[8][8]);
+
+		void Figure::Render();
 };
 

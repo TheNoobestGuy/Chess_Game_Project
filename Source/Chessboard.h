@@ -1,33 +1,35 @@
 #pragma once
 
 #include "GameEngine.h"
+
+// Figures
 #include "Pawn.h"
-
-struct Field
-{
-	Field_ID field_ID;
-	int field_size;
-	bool color;
-
-	Figure* figure;
-	SDL_Rect field_rect = GameEngine::CreateRectangle(field_ID.row, field_ID.col, field_size);
-};
+#include "Knight.h"
+#include "Bishop.h"
+#include "Rook.h"
+#include "Queen.h"
+#include "King.h"
 
 class Chessboard
 {
 	private:
+		// Properties
 		int player;
 		int fields_size;
 
+		// Update
 		bool make_move;
 		Field_ID move_to;
-		bool moved_figure;
+		bool update_board;
 
-		Field chessboard[8][8];
+		// Chessboard
+		Field* chessboard[8][8];
 
+		// Figures
 		Figure* current_figure;
-		Figure* white_player[8];
-		Figure* black_player[8];
+		SDL_Rect* last_collision;
+		std::vector<Figure*> white_player;
+		std::vector<Figure*> black_player;
 
 	public:
 		Chessboard(int fields_size);
@@ -41,7 +43,7 @@ class Chessboard
 		void DrawBoard();
 		void DrawFigures();
 		void SwitchTurns();
-		void BoardTracer();
+		void BoardUpdate();
 		void UpdateFigures();
 		void RenderFigures();
 
@@ -52,11 +54,8 @@ class Chessboard
 
 // ****************** TEST TEXTURES ******************
 	private:
-		struct Texture
-		{
-			SDL_Texture* texture;
-			SDL_Rect srcRect = GameEngine::CreateRectangle(0, 0, 64);
-		};
+
+		bool test = true;
 
 		Texture fields_colors[2] =
 		{

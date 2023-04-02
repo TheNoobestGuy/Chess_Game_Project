@@ -133,4 +133,3 @@ bool GameEngine::CollisionDetector(int &x_coordinate, int &y_coordinate, SDL_Rec
 	}
 	return false;
 }
-
