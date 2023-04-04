@@ -7,6 +7,7 @@ Chessboard::Chessboard(int fields_size)
 	this->fields_size = fields_size;
 
 	// Update
+	this->figure_picked_up = false;
 	this->make_move = false;
 	this->move_to = { 0, 0 };
 	this->update_board = true;
@@ -51,12 +52,12 @@ void Chessboard::CreateBoard()
 		{
 			if (color == 1)
 			{
-				chessboard[row][col] = new Field { { col, row }, fields_size, color, 0, 0, false };
+				chessboard[row][col] = new Field{ { col, row }, fields_size, color, nullptr };
 				color = 0;
 			}
 			else
 			{
-				chessboard[row][col] = new Field { { col, row }, fields_size, color, 0, 0, false };
+				chessboard[row][col] = new Field { { col, row }, fields_size, color, nullptr };
 				color = 1;
 			}
 		}
@@ -65,40 +66,60 @@ void Chessboard::CreateBoard()
 
 void Chessboard::CreateFigures()
 {
-	for (int i = 0; i < 8; i++)
+	int ID = 1;
+
+	// Pawns
+	std::string name = "Pawn";
+	for (int i = 0; i < 8; i++, ID++)
 	{
-		white_player.push_back(new Pawn(i+1, chessboard[6][i]->field_ID, 0, 64));
-		black_player.push_back(new Pawn(i+1, chessboard[1][i]->field_ID, 1, 64));
+		white_player.push_back(new Pawn(name, ID, chessboard[6][i]->field_ID, 0, 64));
+		black_player.push_back(new Pawn(name, ID, chessboard[1][i]->field_ID, 1, 64));
 	}
 
-	// ???
-	white_player.push_back(new Knight(12, chessboard[7][1]->field_ID, 0, 64));
-	white_player.push_back(new Knight(13, chessboard[7][6]->field_ID, 0, 64));
+	// Knights
+	name = "Knight";
+	for (int i = 1; i < 8; i+=5, ID++)
+	{
+		white_player.push_back(new Knight(name, ID, chessboard[7][i]->field_ID, 0, 64));
+		black_player.push_back(new Knight(name, ID, chessboard[0][i]->field_ID, 1, 64));
+	}
 
-	white_player.push_back(new Rook(14, chessboard[7][0]->field_ID, 0, 64));
-	white_player.push_back(new Rook(15, chessboard[7][7]->field_ID, 0, 64));
+	// Bishops
+	name = "Bishop";
+	for (int i = 2; i < 8; i+=3, ID++)
+	{
+		white_player.push_back(new Bishop(name, ID, chessboard[7][i]->field_ID, 0, 64));
+		black_player.push_back(new Bishop(name, ID, chessboard[0][i]->field_ID, 1, 64));
+	}
 
-	white_player.push_back(new Bishop(16, chessboard[7][2]->field_ID, 0, 64));
-	white_player.push_back(new Bishop(17, chessboard[7][5]->field_ID, 0, 64));
+	// Rooks
+	name = "Rook";
+	for (int i = 0; i < 8; i+=7, ID++)
+	{
+		white_player.push_back(new Rook(name, ID, chessboard[7][i]->field_ID, 0, 64));
+		black_player.push_back(new Rook(name, ID, chessboard[0][i]->field_ID, 1, 64));
+	}
 
-	white_player.push_back(new Queen(18, chessboard[7][3]->field_ID, 0, 64));
+	// Queens
+	name = "Queen";
+	white_player.push_back(new Queen(name, ID, chessboard[7][3]->field_ID, 0, 64));
+	black_player.push_back(new Queen(name, ID, chessboard[0][3]->field_ID, 1, 64));
 
-	white_player.push_back(new King(20, chessboard[7][4]->field_ID, 0, 64));
-	 
+	// Kings
+	name = "King";
+	ID++;
+	white_player.push_back(new King(name, ID, chessboard[7][4]->field_ID, 0, 64));
+	black_player.push_back(new King(name, ID, chessboard[0][4]->field_ID, 1, 64));
 
-	// ???
-	black_player.push_back(new Knight(12, chessboard[0][1]->field_ID, 1, 64));
-	black_player.push_back(new Knight(13, chessboard[0][6]->field_ID, 1, 64));
-
-	black_player.push_back(new Rook(14, chessboard[0][0]->field_ID, 1, 64));
-	black_player.push_back(new Rook(15, chessboard[0][7]->field_ID, 1, 64));
-
-	black_player.push_back(new Bishop(16, chessboard[0][2]->field_ID, 1, 64));
-	black_player.push_back(new Bishop(17, chessboard[0][5]->field_ID, 1, 64));
-
-	black_player.push_back(new Queen(18, chessboard[0][3]->field_ID, 1, 64));
-
-	black_player.push_back(new King(20, chessboard[0][4]->field_ID, 1, 64));
+	// Append moves
+	for (Figure* figure : white_player)
+	{
+		figure->PossibleMoves();
+	}
+	for (Figure* figure : black_player)
+	{
+		figure->PossibleMoves();
+	}
 }
 
 void Chessboard::DrawBoard()
@@ -128,22 +149,300 @@ void Chessboard::DrawFigures()
 	}
 }
 
+void Chessboard::BoardUpdate()
+{
+	if (update_board)
+	{
+		// Attach positions of figures to board
+		for (int row = 0; row < 8; row++)
+		{
+			for (int col = 0; col < 8; col++)
+			{
+				bool appended_figure = false;
+
+				for (Figure* figure : white_player)
+				{
+					if (row == figure->GetField().y && col == figure->GetField().x)
+					{
+						chessboard[row][col]->figure = figure;
+						appended_figure = true;
+						break;
+					}
+				}
+
+				if (!appended_figure)
+				{
+					for (Figure* figure : black_player)
+					{
+						if (row == figure->GetField().y && col == figure->GetField().x)
+						{
+							chessboard[row][col]->figure = figure;
+							appended_figure = true;
+							break;
+						}
+					}
+				}
+
+				if (!appended_figure)
+				{
+					chessboard[row][col]->figure = nullptr;
+				}
+			}
+		}
+
+		// Calculate available moves of figures
+		CalculateFigureMoves(white_player);
+		CalculateFigureMoves(black_player);
+
+		update_board = false;
+	}
+}
+
 void Chessboard::SwitchTurns()
 {
 	if (update_board)
 	{
 		switch (player)
 		{
-			case 0:
-				player = 1;
-				break;
+		case 0:
+			player = 1;
+			break;
 
-			case 1:
-				player = 0;
-				break;
+		case 1:
+			player = 0;
+			break;
 
-			default:
+		default:
+			break;
+		}
+	}
+}
+
+void Chessboard::UpdateFigures()
+{
+	PickedUpFigure();
+
+	if (player == 0)
+	{
+		for (Figure* figure : white_player)
+		{
+			figure->PickUp(figure_picked_up);
+		}
+	}
+	else
+	{
+		for (Figure* figure : black_player)
+		{
+			figure->PickUp(figure_picked_up);
+		}
+	}
+
+	MoveFigure();
+}
+
+void Chessboard::RenderFigures()
+{
+	SDL_RenderClear(GameEngine::renderer);
+
+	DrawBoard();
+	DrawFigures();
+
+	// Render the picked up figure in front
+	if (current_figure != nullptr)
+		current_figure->Render();
+
+	SDL_RenderPresent(GameEngine::renderer);
+} 
+
+void Chessboard::CalculateFigureMoves(std::vector<Figure*> player_figures)
+{
+	for (Figure* figure : player_figures)
+	{
+		// Clear unactual available moves
+		figure->available_moves.clear();
+
+		// Stack for every axis of move
+		std::stack<Field_ID> current_moves;
+		current_moves.push({ figure->GetField().x, figure->GetField().y });
+
+		// Calculate possible move for figures
+		if (figure->GetName() == "King")
+		{
+			for (int move = 0; move < figure->moves_list.size(); move++)
+			{
+				// Desired move
+				int move_x = figure->GetField().x + figure->moves_list[move].x;
+				int move_y = figure->GetField().y + figure->moves_list[move].y;
+
+				// Check for collisons with other figures
+				if ((move_x >= 0 && move_x < 8) && (move_y >= 0 && move_y < 8))
+				{
+					if (chessboard[move_y][move_x]->figure != nullptr)
+					{
+						if (chessboard[move_y][move_x]->figure->GetColor() != figure->GetColor())
+						{
+							figure->available_moves.push_back({ move_x, move_y });
+						}
+					}
+					else
+					{
+						figure->available_moves.push_back({ move_x, move_y });
+					}
+				}
+			}
+		}
+
+		else if (figure->GetName() == "Queen" || figure->GetName() == "Rook" || figure->GetName() == "Bishop")
+		{
+			for (int move = 0; move < figure->moves_list.size(); move++)
+			{
+				bool next_axis = false;
+
+				while (!next_axis)
+				{
+					// Desired move
+					int move_x = current_moves.top().x + figure->moves_list[move].x;
+					int move_y = current_moves.top().y + figure->moves_list[move].y;
+
+					// Check for collisons with other figures
+					if ((move_x >= 0 && move_x < 8) && (move_y >= 0 && move_y < 8))
+					{
+						if (chessboard[move_y][move_x]->figure != nullptr)
+						{
+							if (chessboard[move_y][move_x]->figure->GetColor() != figure->GetColor())
+							{
+								current_moves.push({ move_x, move_y });
+								next_axis = true;
+							}
+							else
+							{
+								next_axis = true;
+							}
+						}
+						else
+						{
+							current_moves.push({ move_x, move_y });
+						}
+					}
+					else
+						next_axis = true;
+				}
+
+				// Push available moves from stack into figure array
+				while (current_moves.size() != 1)
+				{
+					figure->available_moves.push_back(current_moves.top());
+					current_moves.pop();
+				}
+			}
+			current_moves.pop();
+		}
+
+		else if (figure->GetName() == "Knight")
+		{
+			for (int move = 0; move < figure->moves_list.size(); move++)
+			{
+				// Desired move
+				int move_x = figure->GetField().x + figure->moves_list[move].x;
+				int move_y = figure->GetField().y + figure->moves_list[move].y;
+
+				// Check for collisons with other figures
+				if ((move_x >= 0 && move_x < 8) && (move_y >= 0 && move_y < 8))
+				{
+					if (chessboard[move_y][move_x]->figure != nullptr)
+					{
+						if (chessboard[move_y][move_x]->figure->GetColor() != figure->GetColor())
+						{
+							figure->available_moves.push_back({ move_x, move_y });
+						}
+					}
+					else
+					{
+						figure->available_moves.push_back({ move_x, move_y });
+					}
+				}
+			}
+		}
+
+		else if (figure->GetName() == "Pawn")
+		{
+			// Desired move
+			int move_x = figure->GetField().x + figure->moves_list[0].x;
+			int move_y = figure->GetField().y + figure->moves_list[0].y;
+
+			if ((move_x >= 0 && move_x < 8) && (move_y >= 0 && move_y < 8))
+			{
+				if (chessboard[move_y][move_x]->figure == nullptr)
+				{
+					figure->available_moves.push_back({ move_x, move_y });
+
+					// First move special
+					if (figure->IsItFirstMove())
+					{
+						move_x = figure->GetField().x + figure->moves_list[1].x;
+						move_y = figure->GetField().y + figure->moves_list[1].y;
+
+						figure->available_moves.push_back({ move_x, move_y });
+					}
+				}
+			}
+
+			// Attack
+			for (int attack = 2; attack < 4; attack++)
+			{
+				int attack_x = figure->GetField().x + figure->moves_list[attack].x;
+				int attack_y = figure->GetField().y + figure->moves_list[attack].y;
+
+				if ((attack_x >= 0 && attack_x < 8) && (attack_y >= 0 && attack_y < 8))
+				{
+					if (chessboard[attack_y][attack_x]->figure != nullptr && chessboard[attack_y][attack_x]->figure->GetColor() != figure->GetColor())
+					{
+						figure->available_moves.push_back({ attack_x, attack_y });
+					}
+				}
+			}
+
+			// En passant
+			for (int en_passant = 4; en_passant < 6; en_passant++)
+			{
+				int en_passant_x = figure->GetField().x + figure->moves_list[en_passant].x;
+				int en_passant_y = figure->GetField().y + figure->moves_list[en_passant].y;
+
+				if ((en_passant_x >= 0 && en_passant_x < 8) && (en_passant_y >= 0 && en_passant_y < 8))
+				{
+					if (chessboard[en_passant_y][en_passant_x]->figure != nullptr && chessboard[en_passant_y][en_passant_x]->figure->GetColor() != figure->GetColor())
+					{
+						if (chessboard[en_passant_y][en_passant_x]->figure->GetName() == "Pawn" && chessboard[en_passant_y][en_passant_x]->figure)
+						figure->available_moves.push_back({ en_passant_x, en_passant_y });
+					}
+				}
+			}
+		}
+	}
+}
+
+void Chessboard::PickedUpFigure()
+{
+	if (true)
+	{
+		current_figure = nullptr;
+
+		for (Figure* figure : white_player)
+		{
+			if (figure->PickedUp())
+			{
+				current_figure = figure;
 				break;
+			}
+		}
+
+		for (Figure* figure : black_player)
+		{
+			if (figure->PickedUp())
+			{
+				current_figure = figure;
+				break;
+			}
 		}
 	}
 }
@@ -159,9 +458,10 @@ void Chessboard::MoveFigure()
 			{
 				if (GameEngine::CollisionDetector(current_figure->GetMotionRect(), &chessboard[current_figure->available_moves[move].y][current_figure->available_moves[move].x]->field_rect))
 				{
+					std::cout << "TEST" << std::endl;
 					if (!make_move)
 					{
-						std::cout << "MOVE HERE" << std::endl;
+						std::cout << "MOVE" << std::endl;
 
 						move_to.x = current_figure->available_moves[move].x;
 						move_to.y = current_figure->available_moves[move].y;
@@ -183,19 +483,17 @@ void Chessboard::MoveFigure()
 			}
 		}
 
-		// Send new field ID to figure and check if is there any collision with some other figures
+		// Send new field ID to figure and check if there is any collision with some other figures
 		if (make_move && !current_figure->PickedUp())
 		{
-
-			std::cout << current_figure->EnPassantBeating() << std::endl;
-			// Attack								(Delete figure from attacking field)																(En passant condition)						
-			if ((chessboard[move_to.y][move_to.x]->occupied && chessboard[move_to.y][move_to.x]->figure_color != current_figure->GetColor()) || (current_figure->EnPassantBeating() != 0))
+			// Attack								(Delete figure from attacking field)				
+			if (chessboard[move_to.y][move_to.x]->figure != nullptr && chessboard[move_to.y][move_to.x]->figure->GetColor() != current_figure->GetColor())
 			{
 				if (current_figure->GetColor() == 0)
 				{
 					for (Figure* figure : black_player)
 					{
-						if (figure->GetFigureID() == chessboard[move_to.y][move_to.x]->figure_ID)
+						if (figure->GetID() == chessboard[move_to.y][move_to.x]->figure->GetID())
 						{
 							figure->Delete();
 							break;
@@ -206,25 +504,11 @@ void Chessboard::MoveFigure()
 				{
 					for (Figure* figure : white_player)
 					{
-						if (figure->GetFigureID() == chessboard[move_to.y][move_to.x]->figure_ID)
+						if (figure->GetID() == chessboard[move_to.y][move_to.x]->figure->GetID())
 						{
 							figure->Delete();
 							break;
 						}
-					}
-				}
-			}
-			
-			// Hold information about pawn move for possible en passant
-			if (current_figure->IsItFirstMove())
-			{
-				if (current_figure->GetFigureID() <= 8)
-				{
-					int double_move = current_figure->GetFieldID().y - current_figure->available_moves.back().y;
-
-					if (double_move == 2 || double_move == -2)
-					{
-						chessboard[current_figure->available_moves.back().y][current_figure->available_moves.back().x]->en_passant = true;
 					}
 				}
 			}
@@ -233,136 +517,7 @@ void Chessboard::MoveFigure()
 			current_figure->ChangePosition(move_to);
 			update_board = true;
 			make_move = false;
-
 			current_figure = nullptr;
 		}
 	}
 }
-
-void Chessboard::PickedUpFigure()
-{
-	current_figure = nullptr;
-
-	for (Figure* figure : white_player)
-	{
-		if (figure->PickedUp())
-		{
-			current_figure = figure;
-			break;
-		}
-	}
-
-	for (Figure* figure : black_player)
-	{
-		if (figure->PickedUp())
-		{
-			current_figure = figure;
-			break;
-		}
-	}
-}
-
-void Chessboard::BoardUpdate()
-{
-	if (update_board)
-	{
-		// Update positions of figures on board
-		for (int row = 0; row < 8; row++)
-		{
-			for (int col = 0; col < 8; col++)
-			{
-				bool appended_figure = false;
-
-				for (Figure* figure : white_player)
-				{
-					if (row == figure->GetFieldID().y && col == figure->GetFieldID().x)
-					{
-						chessboard[row][col]->figure_ID = figure->GetFigureID();
-						chessboard[row][col]->figure_color = 0;
-						chessboard[row][col]->occupied = true;
-						appended_figure = true;
-						break;
-					}
-				}
-
-				if (!appended_figure)
-				{
-					for (Figure* figure : black_player)
-					{
-						if (row == figure->GetFieldID().y && col == figure->GetFieldID().x)
-						{
-							chessboard[row][col]->figure_ID = figure->GetFigureID();
-							chessboard[row][col]->figure_color = 1;
-							chessboard[row][col]->occupied = true;
-							appended_figure = true;
-							break;
-						}
-					}
-				}
-
-				if (!appended_figure)
-				{
-					chessboard[row][col]->figure_ID = 0;
-					chessboard[row][col]->occupied = false;
-					chessboard[row][col]->figure_color = 0;
-				}
-			}
-		}
-
-		// Update possible moves of figures whose turn is now
-		if (player == 0)
-		{
-			for (Figure* figure : white_player)
-			{
-				figure->available_moves.clear();
-				figure->AvailableMoves(chessboard);
-			}
-		}
-		else if (player == 1)
-		{
-			for (Figure* figure : black_player)
-			{
-				figure->available_moves.clear();
-				figure->AvailableMoves(chessboard);
-			}
-		}
-
-		update_board = false;
-	}
-}
-
-void Chessboard::UpdateFigures()
-{
-	PickedUpFigure();
-
-	if (player == 0)
-	{
-		for (Figure* figure : white_player)
-		{
-			figure->PickUp();
-		}
-	}
-	else
-	{
-		for (Figure* figure : black_player)
-		{
-			figure->PickUp();
-		}
-	}
-
-	MoveFigure();
-}
-
-void Chessboard::RenderFigures()
-{
-	SDL_RenderClear(GameEngine::renderer);
-
-	DrawBoard();
-	DrawFigures();
-
-	// Render the picked up figure in front
-	if (current_figure != nullptr)
-		current_figure->Render();
-
-	SDL_RenderPresent(GameEngine::renderer);
-} 

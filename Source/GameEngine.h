@@ -49,26 +49,13 @@ struct Field_ID
 {
 	int x;
 	int y;
+
+	bool operator==(const Field_ID& field) const
+	{
+		return x == field.x && y == field.y;
+	}
 };
 
-struct Field
-{
-	// Field proporties
-	Field_ID field_ID;
-	int field_size;
-	int color;
-
-	// Figure on field
-	int figure_ID;
-	bool figure_color;
-	bool occupied;
-
-	// En passant possible
-	bool en_passant = false;
-
-	// Rectangle
-	SDL_Rect field_rect = GameEngine::CreateRectangle(field_ID.x, field_ID.y, field_size);
-};
 
 struct Texture
 {

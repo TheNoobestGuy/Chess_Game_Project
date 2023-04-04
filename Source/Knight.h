@@ -5,7 +5,7 @@
 class Knight : public Figure
 {
 	private:
-		Field_ID moves_list[8] =
+		Field_ID movement[8] =
 		{
 			//				 X axis									     Y axis				
 			{ -2, -1}, { -2, 1}, { 2, -1}, { 2, 1},    { -1, -2}, { 1, -2}, { 1, 2}, { -1, 2},
@@ -20,8 +20,20 @@ class Knight : public Figure
 	public:
 		using Figure::Figure;
 
-		void AvailableMoves(Field* chessboard[8][8]);
+		void PossibleMoves()
+		{
+			for (Field_ID move : movement)
+			{
+				moves_list.push_back(move);
+			}
+		}
 
-		void Render();
+		void Render()
+		{
+			if (picked_up)
+				TextureMenager::Draw(knight_textures[color].texture, knight_textures[color].srcRect, motion_rect);
+			else
+				TextureMenager::Draw(knight_textures[color].texture, knight_textures[color].srcRect, figure_rect);
+		}
 };
 

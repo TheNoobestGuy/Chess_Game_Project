@@ -10,6 +10,20 @@
 #include "Queen.h"
 #include "King.h"
 
+struct Field
+{
+	// Field proporties
+	Field_ID field_ID;
+	int field_size;
+	int color;
+
+	// Figure at field
+	Figure* figure;
+
+	// Rectangle
+	SDL_Rect field_rect = GameEngine::CreateRectangle(field_ID.x, field_ID.y, field_size);
+};
+
 class Chessboard
 {
 	private:
@@ -18,6 +32,7 @@ class Chessboard
 		int fields_size;
 
 		// Update
+		bool figure_picked_up;
 		bool make_move;
 		Field_ID move_to;
 		bool update_board;
@@ -42,14 +57,17 @@ class Chessboard
 		// Board features
 		void DrawBoard();
 		void DrawFigures();
-		void SwitchTurns();
+
 		void BoardUpdate();
+		void SwitchTurns();
+
 		void UpdateFigures();
 		void RenderFigures();
 
 		// Figures features
-		void MoveFigure();
+		void CalculateFigureMoves(std::vector<Figure*> player_figures);
 		void PickedUpFigure();
+		void MoveFigure();
 
 
 // ****************** TEST TEXTURES ******************

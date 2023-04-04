@@ -6,15 +6,14 @@ class Figure
 {
 	protected:
 		// Properties
+		std::string name;
 		int ID;
-		Field_ID field_ID;
 		int color;
 		int size;
-		SDL_Texture* texture;
+		Field_ID occupied_field;
+		Texture texture;
 
-		// Movement
-		static bool FigurePickedUp;
-		int en_passant_attack;
+		// Movements
 		bool first_move;
 		bool picked_up;
 
@@ -23,30 +22,33 @@ class Figure
 		SDL_Rect motion_rect;
 
 	public:
-		Figure(int figure_ID, Field_ID field_ID, bool color, int size);
+		Figure(std::string name, int figure_ID, Field_ID field_ID, bool color, int size);
 		~Figure();
 
 		// Possible plays
 		std::vector<Field_ID> available_moves;
+		std::vector<Field_ID> moves_list;
 
-		// Figure features
-		virtual void AvailableMoves(Field* chessboard[8][8]) = 0;
-		void ChangePosition(Field_ID field_ID);
-		void PickUp();
+		// Figure feature
+		virtual void PossibleMoves() = 0;
+		void PickUp(bool &figure_picked_up);
 
 		// Draw function
+		void ChangePosition(Field_ID &field);
 		virtual void Render() = 0;
 
 		// Properties
-		int GetFigureID() { return ID; }
-		Field_ID GetFieldID() { return field_ID; }
+		std::string GetName() { return name; }
+		int GetID() { return ID; }
+		Field_ID GetField() { return occupied_field; }
+		int GetColor() { return color; }
 
-		bool GetColor() { return color; }
 		bool IsItFirstMove() { return first_move; }
-		int EnPassantBeating() { return en_passant_attack; }
+		void NotFirstMove() { first_move = false; }
+
+		bool PickedUp() { return picked_up; }
 
 		SDL_Rect* GetMotionRect() { return &motion_rect;  }
-		bool PickedUp() { return picked_up; }
 
 		// ****************** TEST ******************
 		void Delete();

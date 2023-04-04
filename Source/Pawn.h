@@ -5,13 +5,12 @@
 class Pawn : public Figure
 {
 	private:
-		Field_ID moves_list[2][2] =
+		Field_ID movement[2][2] =
 		{
 			// White pawn
-			{ { 0, -1}, { 0, -2}},
+			{ { 0, -1}, { 0, -2} },
 
-			// Black pawn
-			{ { 0,  1}, { 0,  2}}
+			{ { 0,  1}, { 0,  2} }
 		};
 
 		Field_ID attacks_list[3][2] =
@@ -35,8 +34,30 @@ class Pawn : public Figure
 	public:
 		using Figure::Figure;
 
-		void AvailableMoves(Field* chessboard[8][8]);
+		void PossibleMoves()
+		{
+			for (int move = 0; move < 2; move++)
+			{
+				moves_list.push_back(movement[color][move]);
+			}
 
-		void Render();
+			for (int attack = 0; attack < 2; attack++)
+			{
+				moves_list.push_back(attacks_list[color][attack]);
+			}
+
+			for (int en_passsant = 0; en_passsant < 2; en_passsant++)
+			{
+				moves_list.push_back(attacks_list[2][en_passsant]);
+			}
+		}
+
+		void Render()
+		{
+			if (picked_up)
+				TextureMenager::Draw(pawns_textures[color].texture, pawns_textures[color].srcRect, motion_rect);
+			else
+				TextureMenager::Draw(pawns_textures[color].texture, pawns_textures[color].srcRect, figure_rect);
+		}
 };
 

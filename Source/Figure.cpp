@@ -1,13 +1,13 @@
 #include "Figure.h"
 
-Figure::Figure(int ID, Field_ID field_ID, bool color, int size)
+Figure::Figure(std::string name, int ID, Field_ID field_ID, bool color, int size)
 {
+	this->name = name;
 	this->ID = ID;
-	this->field_ID = field_ID;
+	this->occupied_field = field_ID;
 	this->color = color;
 	this->size = size;
 
-	this->en_passant_attack = 0;
 	this->first_move = true;
 	this->picked_up = false;
 
@@ -17,32 +17,17 @@ Figure::Figure(int ID, Field_ID field_ID, bool color, int size)
 
 Figure::~Figure() {}
 
-bool Figure::FigurePickedUp = false;
-
-void Figure::ChangePosition(Field_ID field_ID)
+void Figure::PickUp(bool &figure_picked_up)
 {
-	this->field_ID = field_ID;
-
-	figure_rect.x = field_ID.x * size;
-	figure_rect.y = field_ID.y * size;
-
-	if (this->first_move)
-	{
-		this->first_move = false;
-	}
-}
-
-void Figure::PickUp()
-{
-	if (GameEngine::CollisionDetector(GameEngine::mouse_x, GameEngine::mouse_y, &figure_rect) && GameEngine::mouse_left && !FigurePickedUp)
+	if (GameEngine::CollisionDetector(GameEngine::mouse_x, GameEngine::mouse_y, &figure_rect) && GameEngine::mouse_left && !figure_picked_up)
 	{
 		picked_up = true;
-		FigurePickedUp = true;
+		figure_picked_up = true;
 	}
-	else if (picked_up && !GameEngine::mouse_left && FigurePickedUp)
+	else if (picked_up && !GameEngine::mouse_left && figure_picked_up)
 	{
 		picked_up = false;
-		FigurePickedUp = false;
+		figure_picked_up = false;
 	}
 
 	if (picked_up)
@@ -52,10 +37,21 @@ void Figure::PickUp()
 	}
 }
 
+void Figure::ChangePosition(Field_ID& field)
+{
+	this->occupied_field = field;
+
+	figure_rect.x = occupied_field.x * size;
+	figure_rect.y = occupied_field.y * size;
+
+	if (first_move)
+		first_move = false;
+}
+
 // ****************** TEST ******************
 void Figure::Delete()
 {
-	this->field_ID = { -1, -1 };
+	this->occupied_field = { -1, -1 };
 	this->picked_up = false;
 
 	this->figure_rect = GameEngine::CreateRectangle(0, 0, 0);

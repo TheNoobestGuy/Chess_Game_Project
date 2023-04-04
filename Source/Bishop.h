@@ -5,9 +5,7 @@
 class Bishop : public Figure
 {
 	private:
-		std::stack<Field_ID> current_moves;
-
-		Field_ID moves_list[4] =
+		Field_ID movement[4] =
 		{
 			//             Curve axis
 			{ -1, -1}, { 1, -1}, { 1, 1}, { -1, 1}
@@ -22,8 +20,20 @@ class Bishop : public Figure
 	public:
 		using Figure::Figure;
 
-		void AvailableMoves(Field* chessboard[8][8]);
+		void PossibleMoves()
+		{
+			for (Field_ID move : movement)
+			{
+				moves_list.push_back(move);
+			}
+		}
 
-		void Render();
+		void Render()
+		{
+			if (picked_up)
+				TextureMenager::Draw(bishop_textures[color].texture, bishop_textures[color].srcRect, motion_rect);
+			else
+				TextureMenager::Draw(bishop_textures[color].texture, bishop_textures[color].srcRect, figure_rect);
+		}
 };
 

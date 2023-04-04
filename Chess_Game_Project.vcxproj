@@ -137,12 +137,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Bishop.cpp" />
-    <ClCompile Include="Source\King.cpp" />
-    <ClCompile Include="Source\Knight.cpp" />
-    <ClCompile Include="Source\Queen.cpp" />
-    <ClCompile Include="Source\Rook.cpp" />
-    <ClCompile Include="Source\Pawn.cpp" />
     <ClCompile Include="Source\Figure.cpp" />
     <ClCompile Include="Source\GameEngine.cpp" />
     <ClCompile Include="Source\Chessboard.cpp" />
