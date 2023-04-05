@@ -17,11 +17,20 @@ struct Field
 	int field_size;
 	int color;
 
-	// Figure at field
-	Figure* figure;
+	// Figures
+	Figure* figure = nullptr;
+	bool en_passant = false;
+	bool field_under_attack[2] = { false, false };
 
 	// Rectangle
 	SDL_Rect field_rect = GameEngine::CreateRectangle(field_ID.x, field_ID.y, field_size);
+};
+
+struct FigureMove
+{
+	int x;
+	int y;
+	Figure* attacked_figure = nullptr;
 };
 
 class Chessboard
@@ -34,7 +43,7 @@ class Chessboard
 		// Update
 		bool figure_picked_up;
 		bool make_move;
-		Field_ID move_to;
+		FigureMove move_to;
 		bool update_board;
 
 		// Chessboard
@@ -45,6 +54,7 @@ class Chessboard
 		SDL_Rect* last_collision;
 		std::vector<Figure*> white_player;
 		std::vector<Figure*> black_player;
+		std::stack<Figure*> removed_figures;
 
 	public:
 		Chessboard(int fields_size);
@@ -65,7 +75,9 @@ class Chessboard
 		void RenderFigures();
 
 		// Figures features
+		void MarkFieldsUnderAttack(std::vector<Figure*> player_figures, int array_pos);
 		void CalculateFigureMoves(std::vector<Figure*> player_figures);
+		void KingMechanic(std::vector<Figure*> player_figures);
 		void PickedUpFigure();
 		void MoveFigure();
 

@@ -8,6 +8,12 @@ Figure::Figure(std::string name, int ID, Field_ID field_ID, bool color, int size
 	this->color = color;
 	this->size = size;
 
+	if (color == 0)
+		this->player = 1;
+	else if (color == 1)
+		this->player = 2;
+
+	this->en_passant = false;
 	this->first_move = true;
 	this->picked_up = false;
 
@@ -37,7 +43,7 @@ void Figure::PickUp(bool &figure_picked_up)
 	}
 }
 
-void Figure::ChangePosition(Field_ID& field)
+void Figure::ChangePosition(Field_ID field)
 {
 	this->occupied_field = field;
 
@@ -45,7 +51,13 @@ void Figure::ChangePosition(Field_ID& field)
 	figure_rect.y = occupied_field.y * size;
 
 	if (first_move)
+	{
 		first_move = false;
+	}
+	else
+	{
+		en_passant = false;
+	}
 }
 
 // ****************** TEST ******************

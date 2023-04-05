@@ -10,10 +10,12 @@ class Figure
 		int ID;
 		int color;
 		int size;
+		int player;
 		Field_ID occupied_field;
 		Texture texture;
 
 		// Movements
+		bool en_passant;
 		bool first_move;
 		bool picked_up;
 
@@ -34,19 +36,21 @@ class Figure
 		void PickUp(bool &figure_picked_up);
 
 		// Draw function
-		void ChangePosition(Field_ID &field);
+		void ChangePosition(Field_ID field);
 		virtual void Render() = 0;
 
 		// Properties
 		std::string GetName() { return name; }
 		int GetID() { return ID; }
 		Field_ID GetField() { return occupied_field; }
-		int GetColor() { return color; }
+		int GetPlayer() { return player; }
 
 		bool IsItFirstMove() { return first_move; }
 		void NotFirstMove() { first_move = false; }
 
 		bool PickedUp() { return picked_up; }
+		bool EnPassant() { return en_passant; }
+		void EnPassantVulnerablity() { en_passant = true; }
 
 		SDL_Rect* GetMotionRect() { return &motion_rect;  }
 
