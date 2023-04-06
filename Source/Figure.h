@@ -15,6 +15,7 @@ class Figure
 		Texture texture;
 
 		// Movements
+		bool entangled;
 		bool en_passant;
 		bool first_move;
 		bool picked_up;
@@ -28,6 +29,7 @@ class Figure
 		~Figure();
 
 		// Possible plays
+		std::vector<Field_ID> unavailable_moves;
 		std::vector<Field_ID> available_moves;
 		std::vector<Field_ID> moves_list;
 

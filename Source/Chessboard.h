@@ -50,6 +50,8 @@ class Chessboard
 		Field* chessboard[8][8];
 
 		// Figures
+		Figure* white_king;
+		Figure* black_king;
 		Figure* current_figure;
 		SDL_Rect* last_collision;
 		std::vector<Figure*> white_player;
@@ -77,7 +79,9 @@ class Chessboard
 		// Figures features
 		void MarkFieldsUnderAttack(std::vector<Figure*> player_figures, int array_pos);
 		void CalculateFigureMoves(std::vector<Figure*> player_figures);
-		void KingMechanic(std::vector<Figure*> player_figures);
+		void KingMechanic(std::vector<Figure*> player_figures, Figure* king);
+		void CheckForEntangling(std::vector<Figure*> player_figures);
+		void EndGameConditions(std::vector<Figure*> player_figures, Figure* king, int array_pos);
 		void PickedUpFigure();
 		void MoveFigure();
 

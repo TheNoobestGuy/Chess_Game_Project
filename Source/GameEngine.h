@@ -49,6 +49,11 @@ struct Field_ID
 {
 	int x;
 	int y;
+
+	bool operator==(const Field_ID& field) const
+	{
+		return field.x == x && field.y == y;
+	}
 };
 
 
