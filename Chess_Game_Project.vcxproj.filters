@@ -168,6 +168,15 @@
     <Image Include="Textures\Chessboard\H.png">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="C:\Users\Administrator\Downloads\Mark.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Textures\Chessboard\mark.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Textures\Chessboard\berth.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Library Include="Libraries\SDL2_Image\lib\x64\SDL2_image.lib" />

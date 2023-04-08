@@ -86,6 +86,7 @@ class Chessboard
 		void ApplyEntangledMoves(std::vector<Figure*> player_figures);
 		void EndGameConditions(std::vector<Figure*> player_figures, Figure* king);
 		void PickedUpFigure();
+		void DrawMarksForMovesWhenPicked(std::vector<Figure*> player_figures);
 		void MoveFigure();
 
 
@@ -95,6 +96,12 @@ class Chessboard
 		{
 			{ TextureMenager::LoadTexture("Textures/Chessboard/whiteSqr.png") },
 			{ TextureMenager::LoadTexture("Textures/Chessboard/blackSqr.png") }
+		};
+
+		Texture marks[2] =
+		{
+			{ TextureMenager::LoadTexture("Textures/Chessboard/mark.png") },
+			{ TextureMenager::LoadTexture("Textures/Chessboard/berth.png") }
 		};
 
 		SDL_Texture* numeric_tags[8] =

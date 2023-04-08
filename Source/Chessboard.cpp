@@ -309,6 +309,9 @@ void Chessboard::RenderFigures()
 	DrawBoard();
 	DrawFigures();
 
+	DrawMarksForMovesWhenPicked(white_player);
+	DrawMarksForMovesWhenPicked(black_player);
+
 	// Render the picked up figure in front
 	if (current_figure != nullptr)
 		current_figure->Render();
@@ -780,8 +783,11 @@ void Chessboard::CalculateFigureMoves(std::vector<Figure*> player_figures)
 						move_x = figure->GetField().x + figure->moves_list[1].x;
 						move_y = figure->GetField().y + figure->moves_list[1].y;
 
-						figure->available_moves.push_back({ move_x, move_y });
-						figure->EnPassantVulnerablity();
+						if (chessboard[move_y][move_x]->figure == nullptr)
+						{
+							figure->available_moves.push_back({ move_x, move_y });
+							figure->EnPassantVulnerablity();
+						}
 					}
 				}
 			}
@@ -835,25 +841,46 @@ void Chessboard::CalculateFigureMoves(std::vector<Figure*> player_figures)
 
 void Chessboard::PickedUpFigure()
 {
-	if (true)
+	current_figure = nullptr;
+
+	for (Figure* figure : white_player)
 	{
-		current_figure = nullptr;
-
-		for (Figure* figure : white_player)
+		if (figure->PickedUp())
 		{
-			if (figure->PickedUp())
-			{
-				current_figure = figure;
-				break;
-			}
+			current_figure = figure;
+			break;
 		}
+	}
 
-		for (Figure* figure : black_player)
+	for (Figure* figure : black_player)
+	{
+		if (figure->PickedUp())
 		{
-			if (figure->PickedUp())
+			current_figure = figure;
+			break;
+		}
+	}
+
+}
+
+void Chessboard::DrawMarksForMovesWhenPicked(std::vector<Figure*> player_figures)
+{
+	for (Figure* figure : player_figures)
+	{
+		if (figure->PickedUp())
+		{
+			// Mark for place from where figure was taken 
+			SDL_Rect static_rect = GameEngine::CreateRectangle(figure->GetField().x, figure->GetField().y, fields_size);
+			TextureMenager::Draw(marks[1].texture, marks[1].srcRect, static_rect);
+
+			// Marks for available moves
+			for (Field_ID field : figure->available_moves)
 			{
-				current_figure = figure;
-				break;
+				if (field.available_move)
+				{
+					SDL_Rect possble_moves = GameEngine::CreateRectangle(field.x, field.y, fields_size);
+					TextureMenager::Draw(marks[0].texture, marks[0].srcRect, possble_moves);
+				}
 			}
 		}
 	}

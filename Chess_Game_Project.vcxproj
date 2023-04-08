@@ -162,6 +162,7 @@
     <None Include="SDL2_image.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="C:\Users\Administrator\Downloads\Mark.png" />
     <Image Include="Textures\Chessboard\1.png" />
     <Image Include="Textures\Chessboard\2.png" />
     <Image Include="Textures\Chessboard\3.png" />
@@ -173,6 +174,7 @@
     <Image Include="Textures\Chessboard\9.png" />
     <Image Include="Textures\Chessboard\A.png" />
     <Image Include="Textures\Chessboard\B.png" />
+    <Image Include="Textures\Chessboard\berth.png" />
     <Image Include="Textures\Chessboard\blackSqr.png" />
     <Image Include="Textures\Chessboard\C.png" />
     <Image Include="Textures\Chessboard\D.png" />
@@ -180,6 +182,7 @@
     <Image Include="Textures\Chessboard\F.png" />
     <Image Include="Textures\Chessboard\G.png" />
     <Image Include="Textures\Chessboard\H.png" />
+    <Image Include="Textures\Chessboard\mark.png" />
     <Image Include="Textures\Chessboard\whiteSqr.png" />
     <Image Include="Textures\Figures\black_bishop.png" />
     <Image Include="Textures\Figures\black_king.png" />
