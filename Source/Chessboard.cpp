@@ -257,30 +257,6 @@ void Chessboard::BoardUpdate()
 		EndGameConditions(black_player, black_king);
 
 		update_board = false;
-
-		// TEST ATTACKED FIELDS
-		std::cout << std::endl;
-		std::cout << "WHITE ATTACKS" << std::endl;
-		for (int i = 0; i < 8; i++)
-		{
-			for (int j = 0; j < 8; j++)
-			{
-				std::cout << chessboard[i][j]->field_under_attack[0];
-			}
-			std::cout << std::endl;
-		}
-
-		std::cout << std::endl;
-		std::cout << "BLACK ATTACKS" << std::endl;
-		for (int i = 0; i < 8; i++)
-		{
-			for (int j = 0; j < 8; j++)
-			{
-				std::cout << chessboard[i][j]->field_under_attack[1];
-			}
-			std::cout << std::endl;
-		}
-		std::cout << std::endl;
 	}
 }
 
@@ -452,6 +428,7 @@ void Chessboard::CheckForEntangling(std::vector<Figure*> player_figures, Figure*
 	{
 		if (figure->GetName() != "King")
 		{
+			// Check every possible axis of move and entangle figure that is standing at way of attack on king
 			for (int move_axis = 0; move_axis < 8; move_axis++)
 			{
 				Figure* entangled_figure = nullptr;
@@ -463,6 +440,7 @@ void Chessboard::CheckForEntangling(std::vector<Figure*> player_figures, Figure*
 				{
 					if (field.move_axis == move_axis)
 					{
+						// Keep counter of encountering figure and skip every axis where there is more than one
 						if (chessboard[field.y][field.x]->figure != nullptr)
 						{
 							if (figures_counter == 0)
@@ -479,6 +457,7 @@ void Chessboard::CheckForEntangling(std::vector<Figure*> player_figures, Figure*
 							}
 							else if (figures_counter >= 1)
 							{
+								// If there is encountered opposite king at the way push possible moves for entangled figure into an array of moves
 								if (chessboard[field.y][field.x]->figure->GetName() == "King" && figure->GetPlayer() != chessboard[field.y][field.x]->figure->GetPlayer())
 								{
 									entangled_figure->MakeEntangled();
@@ -563,6 +542,7 @@ void Chessboard::MarkFieldsUnderAttack(std::vector<Figure*> player_figures)
 
 		if (figure->GetName() == "Pawn")
 		{
+			// Static moves applier for Pawns
 			int pos_x_1 = figure->GetField().x - 1;
 			int pos_x_2 = figure->GetField().x + 1;
 			int pos_y = figure->GetField().y;
@@ -590,6 +570,7 @@ void Chessboard::MarkFieldsUnderAttack(std::vector<Figure*> player_figures)
 		}
 		else if (figure->GetName() == "King" || figure->GetName() == "Knight")
 		{
+			// Every possible moves of those figures are also attacks
 			for (Field_ID attack : figure->available_moves)
 			{
 				chessboard[attack.y][attack.x]->field_under_attack[player_pos] = true;
@@ -597,6 +578,7 @@ void Chessboard::MarkFieldsUnderAttack(std::vector<Figure*> player_figures)
 		}
 		else if (figure->GetName() == "Bishop" || figure->GetName() == "Rook" || figure->GetName() == "Queen")
 		{
+			// Check moves by their axis
 			int axis = 0;
 			bool figure_encountered = false;
 
@@ -680,7 +662,7 @@ void Chessboard::CalculateFigureMoves(std::vector<Figure*> player_figures)
 
 				while (!next_axis)
 				{
-					// Check for collisons with other figures
+					// Sort moves on available and unavailable with keeping track of their axis at this moment for further discernion by a marking system later
 					if ((move_x >= 0 && move_x < 8) && (move_y >= 0 && move_y < 8))
 					{
 						if (chessboard[move_y][move_x]->figure != nullptr)
@@ -699,6 +681,7 @@ void Chessboard::CalculateFigureMoves(std::vector<Figure*> player_figures)
 									figure->available_moves.back().move_axis = move;
 									figure->available_moves.back().available_move = true;
 
+									// If king is encountered append way that is leading to him to proper array
 									if (chessboard[move_y][move_x]->figure->GetName() == "King" && chessboard[move_y][move_x]->figure->GetPlayer() != figure->GetPlayer())
 									{
 										figure->way_to_opposite_king = way_to_king;
@@ -708,6 +691,7 @@ void Chessboard::CalculateFigureMoves(std::vector<Figure*> player_figures)
 									unavailable_moves = true;
 								}
 							}
+							// If friendly figure encountered append its position as last attack in axis
 							else if (chessboard[move_y][move_x]->figure->GetPlayer() == figure->GetPlayer())
 							{
 								chessboard[move_y][move_x]->field_under_attack[figure->GetPlayer()-1] = true;
@@ -732,6 +716,7 @@ void Chessboard::CalculateFigureMoves(std::vector<Figure*> player_figures)
 							}
 						}
 					}
+					// If move is out of board go to the next axis
 					else
 					{
 						next_axis = true;
@@ -889,7 +874,6 @@ void Chessboard::MoveFigure()
 					{
 						if (!make_move)
 						{
-							std::cout << "MOVE AVAILABLE" << std::endl;
 							move_to.x = current_figure->available_moves[move].x;
 							move_to.y = current_figure->available_moves[move].y;
 							move_to.attacked_figure = chessboard[current_figure->available_moves[move].y][current_figure->available_moves[move].x]->figure;
@@ -902,7 +886,6 @@ void Chessboard::MoveFigure()
 					{
 						if (!GameEngine::CollisionDetector(current_figure->GetMotionRect(), last_collision))
 						{
-							std::cout << "MOVE NOT POSSIBLE" << std::endl;
 							move_to.x = 0;
 							move_to.y = 0;
 							move_to.attacked_figure = nullptr;
