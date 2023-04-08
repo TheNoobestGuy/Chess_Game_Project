@@ -29,8 +29,9 @@ class Figure
 		~Figure();
 
 		// Possible plays
-		std::vector<Field_ID> unavailable_moves;
 		std::vector<Field_ID> available_moves;
+		std::vector<Field_ID> entangled_moves;
+		std::vector<Field_ID> way_to_opposite_king;
 		std::vector<Field_ID> moves_list;
 
 		// Figure feature
@@ -54,12 +55,9 @@ class Figure
 		bool EnPassant() { return en_passant; }
 		void EnPassantVulnerablity() { en_passant = true; }
 
-		bool IsEntangled() { return entangled; }
+		bool IsItEntangled() { return entangled; }
 		void MakeEntangled() { entangled = true; };
-		void Release() { entangled = false; };
+		void Release() { entangled_moves.clear(); entangled = false; way_to_opposite_king.clear(); }
 
 		SDL_Rect* GetMotionRect() { return &motion_rect;  }
-
-		// ****************** TEST ******************
-		void Delete();
 };

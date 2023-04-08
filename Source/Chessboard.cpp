@@ -7,6 +7,7 @@ Chessboard::Chessboard(int fields_size)
 	this->fields_size = fields_size;
 
 	// Update
+	this->checkmate = false;
 	this->figure_picked_up = false;
 	this->make_move = false;
 	this->move_to = { 0, 0 };
@@ -72,8 +73,6 @@ void Chessboard::CreateFigures()
 
 	// Pawns
 	std::string name = "Pawn";
-	// TESTING
-	/*
 	for (int i = 0; i < 8; i++, ID++)
 	{
 		white_player.push_back(new Pawn(name, ID, chessboard[6][i]->field_ID, 0, 64));
@@ -95,7 +94,7 @@ void Chessboard::CreateFigures()
 		white_player.push_back(new Bishop(name, ID, chessboard[7][i]->field_ID, 0, 64));
 		black_player.push_back(new Bishop(name, ID, chessboard[0][i]->field_ID, 1, 64));
 	}
-	*/
+
 	// Rooks
 	name = "Rook";
 	for (int i = 0; i < 8; i+=7, ID++)
@@ -104,12 +103,10 @@ void Chessboard::CreateFigures()
 		black_player.push_back(new Rook(name, ID, chessboard[0][i]->field_ID, 1, 64));
 	}
 
-	/*
 	// Queens
 	name = "Queen";
 	white_player.push_back(new Queen(name, ID, chessboard[7][3]->field_ID, 0, 64));
 	black_player.push_back(new Queen(name, ID, chessboard[0][3]->field_ID, 1, 64));
-	*/
 
 	// Kings
 	name = "King";
@@ -165,8 +162,32 @@ void Chessboard::BoardUpdate()
 		// Remove from board conquered figures
 		while (!removed_figures.empty())
 		{
-			removed_figures.top()->Delete();
-			removed_figures.pop();
+			if (removed_figures.top()->GetPlayer() == 1)
+			{
+				for (int figure = 0; figure < white_player.size(); figure++)
+				{
+					if (white_player[figure]->GetID() == removed_figures.top()->GetID())
+					{
+						white_player[figure] = nullptr;
+						white_player.erase(white_player.begin() + figure);
+						removed_figures.pop();
+						break;
+					}
+				}
+			}
+			else if (removed_figures.top()->GetPlayer() == 2)
+			{
+				for (int figure = 0; figure < black_player.size(); figure++)
+				{
+					if (black_player[figure]->GetID() == removed_figures.top()->GetID())
+					{
+						black_player[figure] = nullptr;
+						black_player.erase(black_player.begin() + figure);
+						removed_figures.pop();
+						break;
+					}
+				}
+			}
 		}
 
 		// Attach positions of figures to board
@@ -181,6 +202,7 @@ void Chessboard::BoardUpdate()
 					if (row == figure->GetField().y && col == figure->GetField().x)
 					{
 						chessboard[row][col]->figure = figure;
+						chessboard[row][col]->figure->Release();
 						appended_figure = true;
 						break;
 					}
@@ -193,6 +215,7 @@ void Chessboard::BoardUpdate()
 						if (row == figure->GetField().y && col == figure->GetField().x)
 						{
 							chessboard[row][col]->figure = figure;
+							chessboard[row][col]->figure->Release();
 							appended_figure = true;
 							break;
 						}
@@ -206,8 +229,6 @@ void Chessboard::BoardUpdate()
 
 				chessboard[row][col]->field_under_attack[0] = false;
 				chessboard[row][col]->field_under_attack[1] = false;
-				chessboard[row][col]->uavailable_for_king[0] = false;
-				chessboard[row][col]->uavailable_for_king[1] = false;
 				chessboard[row][col]->en_passant = false;
 			}
 		}
@@ -224,16 +245,18 @@ void Chessboard::BoardUpdate()
 		CheckForEntangling(white_player, black_king);
 		CheckForEntangling(black_player, white_king);
 
+		ApplyEntangledMoves(white_player);
+		ApplyEntangledMoves(black_player);
+
 		// Kings mechanics
-		KingMechanic(white_player, black_king);
-		KingMechanic(black_player, white_king);
+		KingMechanic(white_player, black_player, white_king);
+		KingMechanic(black_player, white_player, black_king);
 
-
-		update_board = false;
-
-		// TEST END GAME CONDITIONS
+		// End game conditions check
 		EndGameConditions(white_player, white_king);
 		EndGameConditions(black_player, black_king);
+
+		update_board = false;
 
 		// TEST ATTACKED FIELDS
 		std::cout << std::endl;
@@ -258,44 +281,6 @@ void Chessboard::BoardUpdate()
 			std::cout << std::endl;
 		}
 		std::cout << std::endl;
-
-		/*
-		// TEST UNAVAILABLE MOVES
-		std::cout << std::endl;
-		std::cout << "White player unavailable moves" << std::endl;
-		for (Figure* figure : white_player)
-		{
-			if (!figure->unavailable_moves.empty())
-			{
-				std::cout << std::endl;
-				std::cout << figure->GetName() << std::endl;
-				for (Field_ID field : figure->unavailable_moves)
-				{
-					std::cout << field.y << ", " << field.x << "  |  ";
-				}
-
-				std::cout << std::endl;
-			}
-		}
-
-		std::cout << std::endl;
-		std::cout << "Black player unavailable moves" << std::endl;
-		for (Figure* figure : black_player)
-		{
-			if (!figure->unavailable_moves.empty())
-			{
-				std::cout << std::endl;
-				std::cout << figure->GetName() << std::endl;
-
-				for (Field_ID field : figure->unavailable_moves)
-				{
-					std::cout << field.y << ", " << field.x << "  |  ";
-				}
-
-				std::cout << std::endl;
-			}
-		}
-		*/
 	}
 }
 
@@ -355,176 +340,219 @@ void Chessboard::RenderFigures()
 	SDL_RenderPresent(GameEngine::renderer);
 } 
 
-void Chessboard::KingMechanic(std::vector<Figure*> player_figures, Figure* king)
+void Chessboard::KingMechanic(std::vector<Figure*> player_figures, std::vector<Figure*> opposite_player_figures, Figure* king)
 {
+	// Deduce opposite player
+	int opposite_player = 1;
+
+	if (king->GetPlayer() == 2)
+		opposite_player = 0;
+
 	// Remove unavailable moves from king pool of moves
-	for (Figure* figure : player_figures)
+	std::vector<Field_ID> buffor;
+
+	for (Field_ID move : king->available_moves)
 	{
-		for (int figure_move = 0; figure_move < figure->available_moves.size(); figure_move++)
+		if (!chessboard[move.y][move.x]->field_under_attack[opposite_player])
 		{
-			for (int king_move = 0; king_move < king->available_moves.size(); king_move++)
+			buffor.push_back(move);
+		}
+	}
+	king->available_moves = buffor;
+
+	// Check is there a checkmate and calculate possible moves to save king if there are any
+	if (chessboard[king->GetField().y][king->GetField().x]->field_under_attack[opposite_player])
+	{
+		checkmate = true;
+
+		// Find common attacked fields to defend
+		std::vector<Field_ID> common_fields;
+
+		for (Figure* opposite_figure_1 : opposite_player_figures)
+		{
+			for (Field_ID attack_1 : opposite_figure_1->way_to_opposite_king)
 			{
-				if (king->available_moves[king_move] == figure->available_moves[figure_move])
+				for (Figure* opposite_figure_2 : opposite_player_figures)
 				{
-					king->available_moves.erase(king->available_moves.begin() + king_move);
+					if (opposite_figure_1->GetID() != opposite_figure_2->GetID())
+					{
+						for (Field_ID attack_2 : opposite_figure_2->way_to_opposite_king)
+						{
+							if (attack_1 == attack_2)
+							{
+								common_fields.push_back(attack_1);
+							}
+						}
+					}
 				}
 			}
-		}
-		for (int figure_move = 0; figure_move < figure->unavailable_moves.size(); figure_move++)
-		{
-			for (int king_move = 0; king_move < king->available_moves.size(); king_move++)
+
+			if (common_fields.empty())
 			{
-				if (king->available_moves[king_move] == figure->unavailable_moves[figure_move])
+				common_fields = opposite_figure_1->way_to_opposite_king;
+			}
+		}
+
+		// Find if there is possible defence by move of figures
+		for (Figure* figure : player_figures)
+		{
+			if (figure->GetName() == "Pawn")
+			{
+				buffor.clear();
+
+				for (Field_ID defence : figure->available_moves)
 				{
-					if (king->GetPlayer() == 1)
+					for (Field_ID attack : common_fields)
 					{
-						if (chessboard[figure->unavailable_moves[figure_move].y][figure->unavailable_moves[figure_move].x]->uavailable_for_king[1])
+						if (chessboard[defence.y][defence.x]->figure != nullptr && defence.x == figure->GetField().x)
 						{
-							king->available_moves.erase(king->available_moves.begin() + king_move);
+							continue;
 						}
-					}
-					else if (king->GetPlayer() == 2)
-					{
-						if (chessboard[figure->unavailable_moves[figure_move].y][figure->unavailable_moves[figure_move].x]->uavailable_for_king[0])
+						else
 						{
-							king->available_moves.erase(king->available_moves.begin() + king_move);
+							if (defence == attack)
+							{
+								buffor.push_back(defence);
+							}
 						}
 					}
 				}
+
+				figure->available_moves = buffor;
+			}
+
+			else if (figure->GetName() != "King")
+			{
+				buffor.clear();
+
+				for (Field_ID defence : figure->available_moves)
+				{
+					for (Field_ID attack : common_fields)
+					{
+						if (defence == attack)
+						{
+							buffor.push_back(defence);
+						}
+					}
+				}
+
+				figure->available_moves = buffor;
 			}
 		}
 	}
-
+	else
+	{
+		checkmate = false;
+	}
 }
 
 void Chessboard::CheckForEntangling(std::vector<Figure*> player_figures, Figure* opposite_king)
 {
 	for (Figure* figure : player_figures)
 	{
-		// Check for entangling
-		Figure* entangled_figure = nullptr;
-		std::vector<Field_ID> way_to_king;
-		int figures_counter = 0;
-		int move_axis = 0;
-
-		for (Field_ID field : figure->unavailable_moves)
+		if (figure->GetName() != "King")
 		{
-			// Check is it same move axis
-			if (move_axis != field.move_axis)
+			for (int move_axis = 0; move_axis < 8; move_axis++)
 			{
-				way_to_king.clear();
+				Figure* entangled_figure = nullptr;
+				std::vector<Field_ID> way_to_king;
+				way_to_king.push_back({ figure->GetField().x, figure->GetField().y });
+				int figures_counter = 0;
 
-				move_axis = field.move_axis;
-				figures_counter = 0;
-			}
-
-			// If there is more than two figures on the way just skip calculating this axis
-			if (figures_counter >= 2)
-			{
-				continue;
-			}
-
-			// Check possible approaching way to king by a opposite figure
-			if (chessboard[field.y][field.x]->figure != nullptr)
-			{
-				if (figures_counter == 0)
+				for (Field_ID field : figure->available_moves)
 				{
-					entangled_figure = chessboard[field.y][field.x]->figure;
-					figures_counter++;
-				}
-				else if (figures_counter == 1)
-				{
-					if (chessboard[field.y][field.x]->figure->GetName() == opposite_king->GetName() && figure->GetPlayer() != opposite_king->GetPlayer())
+					if (field.move_axis == move_axis)
 					{
-						std::cout << "ENTANGLED " << entangled_figure->GetPlayer() << std::endl;
-						for (Field_ID field_on_way : way_to_king)
+						if (chessboard[field.y][field.x]->figure != nullptr)
 						{
-							std::cout << field_on_way.y << ", " << field_on_way.x;
-						}
-						std::cout << std::endl;
-
-						for (Field_ID move : entangled_figure->available_moves)
-						{
-							for (Field_ID field_on_way : way_to_king)
+							if (figures_counter == 0)
 							{
-								if (move != field_on_way)
+								if (chessboard[field.y][field.x]->figure->GetName() == "King")
 								{
-									entangled_figure->available_moves.erase(std::remove(entangled_figure->available_moves.begin(), entangled_figure->available_moves.end(), move), entangled_figure->available_moves.end());
+									break;
+								}
+								else
+								{
+									entangled_figure = chessboard[field.y][field.x]->figure;
+									figures_counter++;
 								}
 							}
+							else if (figures_counter >= 1)
+							{
+								if (chessboard[field.y][field.x]->figure->GetName() == "King" && figure->GetPlayer() != chessboard[field.y][field.x]->figure->GetPlayer())
+								{
+									entangled_figure->MakeEntangled();
+
+									for (Field_ID move : entangled_figure->available_moves)
+									{
+										for (Field_ID way : way_to_king)
+										{
+											if (move == way)
+											{
+												entangled_figure->entangled_moves.push_back(way);
+											}
+										}
+									}
+								}
+								break;
+							}
 						}
-						figures_counter++;
-					}
-					else
-					{
-						figures_counter++;
+						else
+						{
+							way_to_king.push_back(field);
+							way_to_king.back().available_move = true;
+						}
 					}
 				}
-				else
-				{
-					figures_counter++;
-				}
-			}
-			// Empty field at way to king
-			else
-			{
-				way_to_king.push_back(field);
-				chessboard[field.y][field.x]->uavailable_for_king[figure->GetPlayer() - 1] = true;
+
+				entangled_figure = nullptr;
 			}
 		}
+	}
+}
 
-		entangled_figure = nullptr;
+void Chessboard::ApplyEntangledMoves(std::vector<Figure*> player_figures)
+{
+	for (Figure* figure : player_figures)
+	{
+		if (figure->IsItEntangled())
+		{
+			figure->available_moves = figure->entangled_moves;
+		}
 	}
 }
 
 void Chessboard::EndGameConditions(std::vector<Figure*> player_figures, Figure* king)
 {
-	// Win
-	if (king->available_moves.empty())
-	{
-		bool surrounded = false;
+	// Check if player has available moves
+	bool no_moves = true;
 
+	for (Figure* figure : player_figures)
+	{
+		if (!figure->available_moves.empty())
+		{
+			no_moves = false;
+			break;
+		}
+	}
+
+	// Win by checkmate
+	if (no_moves && checkmate)
+	{
 		if (king->GetPlayer() == 1)
 		{
-			surrounded = chessboard[king->GetField().y][king->GetField().x]->field_under_attack[1];
+			std::cout << "BLACK PLAYER WON" << std::endl;
 		}
 		else if (king->GetPlayer() == 2)
 		{
-			surrounded = chessboard[king->GetField().y][king->GetField().x]->field_under_attack[0];
-		}
-
-		if (surrounded)
-		{
-			// Check is there is any possible move that can save king from check-mate
-			for (Figure* figure : player_figures)
-			{
-				for (int figure_move = 0; figure_move < figure->available_moves.size(); figure_move++)
-				{
-					
-				}
-			}
-
-			if (king->GetPlayer() == 1)
-				std::cout << "BLACK PLAYER WON" << std::endl;
-			else if (king->GetPlayer() == 2)
-				std::cout << "WHITE PLAYER WON" << std::endl;
+			std::cout << "WHITE PLAYER WON" << std::endl;
 		}
 	}
-
 	// Pat
-	/*
-	for (Figure* figure : player_figures)
+	else if (no_moves)
 	{
-		if (figure->available_moves.empty())
-		{
-			pat = false;
-		}
-		else
-		{
-			pat = true;
-		}
+		std::cout << "REMIS" << std::endl;
 	}
-	*/
 }
 
 void Chessboard::MarkFieldsUnderAttack(std::vector<Figure*> player_figures)
@@ -567,13 +595,32 @@ void Chessboard::MarkFieldsUnderAttack(std::vector<Figure*> player_figures)
 				chessboard[attack.y][attack.x]->field_under_attack[player_pos] = true;
 			}
 		}
-		else
+		else if (figure->GetName() == "Bishop" || figure->GetName() == "Rook" || figure->GetName() == "Queen")
 		{
+			int axis = 0;
+			bool figure_encountered = false;
+
 			for (Field_ID attack : figure->available_moves)
 			{
-				if (chessboard[attack.y][attack.x]->figure != nullptr && chessboard[attack.y][attack.x]->figure->GetName() == "King")
+				if (attack.move_axis != axis)
 				{
+					axis = attack.move_axis;
+					figure_encountered = false;
+				}
 
+				if (figure_encountered)
+				{
+					continue;
+				}
+
+				if (chessboard[attack.y][attack.x]->figure != nullptr)
+				{
+					if (chessboard[attack.y][attack.x]->figure->GetName() != "King")
+					{
+						figure_encountered = true;
+					}
+
+					chessboard[attack.y][attack.x]->field_under_attack[player_pos] = true;
 				}
 				else
 				{
@@ -590,11 +637,6 @@ void Chessboard::CalculateFigureMoves(std::vector<Figure*> player_figures)
 	{
 		// Clear unactual available moves
 		figure->available_moves.clear();
-		figure->unavailable_moves.clear();
-
-		// Stack for every axis of move
-		std::stack<Field_ID> current_moves;
-		current_moves.push({ figure->GetField().x, figure->GetField().y });
 
 		// Calculate possible move for figures
 		if (figure->GetName() == "King")
@@ -627,18 +669,17 @@ void Chessboard::CalculateFigureMoves(std::vector<Figure*> player_figures)
 		{
 			for (int move = 0; move < figure->moves_list.size(); move++)
 			{
-				bool calculate = true;
 				bool next_axis = false;
 				bool unavailable_moves = false;
-				bool append_moves = false;
-				Field_ID last_move = { 0, 0 };
+				std::vector<Field_ID> way_to_king;
+				way_to_king.push_back(figure->GetField());
 
-				while (calculate)
+				// Figure beginning position
+				int move_x = figure->GetField().x + figure->moves_list[move].x;
+				int move_y = figure->GetField().y + figure->moves_list[move].y;
+
+				while (!next_axis)
 				{
-					// Desired move
-					int move_x = current_moves.top().x + figure->moves_list[move].x;
-					int move_y = current_moves.top().y + figure->moves_list[move].y;
-
 					// Check for collisons with other figures
 					if ((move_x >= 0 && move_x < 8) && (move_y >= 0 && move_y < 8))
 					{
@@ -648,92 +689,62 @@ void Chessboard::CalculateFigureMoves(std::vector<Figure*> player_figures)
 							{
 								if (unavailable_moves)
 								{
-									current_moves.push({ move_x, move_y });
-									figure->unavailable_moves.push_back(current_moves.top());
-									figure->unavailable_moves.back().move_axis = move;
+									figure->available_moves.push_back({ move_x, move_y });
+									figure->available_moves.back().move_axis = move;
+									figure->available_moves.back().available_move = false;
 								}
 								else
 								{
-									current_moves.push({ move_x, move_y });
-									figure->unavailable_moves.push_back(current_moves.top());
-									figure->unavailable_moves.back().move_axis = move;
-									append_moves = true;
+									figure->available_moves.push_back({ move_x, move_y });
+									figure->available_moves.back().move_axis = move;
+									figure->available_moves.back().available_move = true;
+
+									if (chessboard[move_y][move_x]->figure->GetName() == "King" && chessboard[move_y][move_x]->figure->GetPlayer() != figure->GetPlayer())
+									{
+										figure->way_to_opposite_king = way_to_king;
+										way_to_king.clear();
+									}
+
+									unavailable_moves = true;
 								}
 							}
 							else if (chessboard[move_y][move_x]->figure->GetPlayer() == figure->GetPlayer())
 							{
-								if (unavailable_moves)
-								{
-									next_axis = true;
-								}
-								else
-								{
-									append_moves = true;
-								}
-							}
-							else
-							{
-								if (unavailable_moves)
-								{
-									current_moves.push({ move_x, move_y });
-									figure->unavailable_moves.push_back(current_moves.top());
-									figure->unavailable_moves.back().move_axis = move;
-								}
-								else
-								{
-									append_moves = true;
-								}
+								chessboard[move_y][move_x]->field_under_attack[figure->GetPlayer()-1] = true;
+								next_axis = true;
 							}
 						}
 						else
 						{	
 							if (unavailable_moves)
 							{
-								current_moves.push({ move_x, move_y });
-								figure->unavailable_moves.push_back(current_moves.top());
-								figure->unavailable_moves.back().move_axis = move;
+								figure->available_moves.push_back({ move_x, move_y });
+								figure->available_moves.back().move_axis = move;
+								figure->available_moves.back().available_move = false;
 							}
 							else
 							{
-								current_moves.push({ move_x, move_y });
+								figure->available_moves.push_back({ move_x, move_y });
+								figure->available_moves.back().move_axis = move;
+								figure->available_moves.back().available_move = true;
+
+								way_to_king.push_back(figure->available_moves.back());
 							}
 						}
 					}
 					else
 					{
 						next_axis = true;
-						append_moves = true;
 					}
 
-					// Push available moves from stack into figure array
-					if (append_moves && !unavailable_moves)
-					{
-						last_move = current_moves.top();
-
-						while (current_moves.size() != 1)
-						{
-							figure->available_moves.push_back(current_moves.top());
-							current_moves.pop();
-						}
-
-						current_moves.push(last_move);
-
-						unavailable_moves = true;
-						append_moves = false;
-					}
-					
-					if (next_axis)
-					{
-						calculate = false;
-					}
+					// Desired move
+					move_x += figure->moves_list[move].x;
+					move_y += figure->moves_list[move].y;
 				}
 
-				// Clear stack
-				while (current_moves.size() != 1)
-				{
-					current_moves.pop();
-				}
+				way_to_king.clear();
 			}
+
 		}
 
 		else if (figure->GetName() == "Knight")
@@ -752,6 +763,10 @@ void Chessboard::CalculateFigureMoves(std::vector<Figure*> player_figures)
 						if (chessboard[move_y][move_x]->figure->GetPlayer() != figure->GetPlayer())
 						{
 							figure->available_moves.push_back({ move_x, move_y });
+						}
+						else if (chessboard[move_y][move_x]->figure->GetPlayer() == figure->GetPlayer())
+						{
+							chessboard[move_y][move_x]->field_under_attack[figure->GetPlayer()-1] = true;
 						}
 					}
 					else
@@ -797,6 +812,10 @@ void Chessboard::CalculateFigureMoves(std::vector<Figure*> player_figures)
 					if (chessboard[attack_y][attack_x]->figure != nullptr && chessboard[attack_y][attack_x]->figure->GetPlayer() != figure->GetPlayer())
 					{
 						figure->available_moves.push_back({ attack_x, attack_y });
+					}
+					else if (chessboard[attack_y][attack_x]->figure != nullptr && chessboard[attack_y][attack_x]->figure->GetPlayer() == figure->GetPlayer())
+					{
+						chessboard[attack_y][attack_x]->field_under_attack[figure->GetPlayer() - 1] = true;
 					}
 				}
 			}
@@ -864,30 +883,33 @@ void Chessboard::MoveFigure()
 		{
 			for (int move = 0; move < current_figure->available_moves.size(); move++)
 			{
-				if (GameEngine::CollisionDetector(current_figure->GetMotionRect(), &chessboard[current_figure->available_moves[move].y][current_figure->available_moves[move].x]->field_rect))
+				if (current_figure->available_moves[move].available_move)
 				{
-					if (!make_move)
+					if (GameEngine::CollisionDetector(current_figure->GetMotionRect(), &chessboard[current_figure->available_moves[move].y][current_figure->available_moves[move].x]->field_rect))
 					{
-						std::cout << "MOVE AVAILABLE" << std::endl;
-						move_to.x = current_figure->available_moves[move].x;
-						move_to.y = current_figure->available_moves[move].y;
-						move_to.attacked_figure = chessboard[current_figure->available_moves[move].y][current_figure->available_moves[move].x]->figure;
+						if (!make_move)
+						{
+							std::cout << "MOVE AVAILABLE" << std::endl;
+							move_to.x = current_figure->available_moves[move].x;
+							move_to.y = current_figure->available_moves[move].y;
+							move_to.attacked_figure = chessboard[current_figure->available_moves[move].y][current_figure->available_moves[move].x]->figure;
 
-						make_move = true;
-						last_collision = &chessboard[current_figure->available_moves[move].y][current_figure->available_moves[move].x]->field_rect;
+							make_move = true;
+							last_collision = &chessboard[current_figure->available_moves[move].y][current_figure->available_moves[move].x]->field_rect;
+						}
 					}
-				}
-				else if (last_collision != nullptr)
-				{
-					if (!GameEngine::CollisionDetector(current_figure->GetMotionRect(), last_collision))
+					else if (last_collision != nullptr)
 					{
-						std::cout << "MOVE NOT POSSIBLE" << std::endl;
-						move_to.x = 0;
-						move_to.y = 0;
-						move_to.attacked_figure = nullptr;
+						if (!GameEngine::CollisionDetector(current_figure->GetMotionRect(), last_collision))
+						{
+							std::cout << "MOVE NOT POSSIBLE" << std::endl;
+							move_to.x = 0;
+							move_to.y = 0;
+							move_to.attacked_figure = nullptr;
 
-						make_move = false;
-						last_collision = nullptr;
+							make_move = false;
+							last_collision = nullptr;
+						}
 					}
 				}
 			}

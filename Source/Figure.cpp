@@ -13,6 +13,7 @@ Figure::Figure(std::string name, int ID, Field_ID field_ID, bool color, int size
 	else if (color == 1)
 		this->player = 2;
 
+	this->entangled = false;
 	this->en_passant = false;
 	this->first_move = true;
 	this->picked_up = false;
@@ -60,14 +61,3 @@ void Figure::ChangePosition(Field_ID field)
 		en_passant = false;
 	}
 }
-
-// ****************** TEST ******************
-void Figure::Delete()
-{
-	this->occupied_field = { -1, -1 };
-	this->picked_up = false;
-
-	this->figure_rect = GameEngine::CreateRectangle(0, 0, 0);
-	this->motion_rect = GameEngine::CreateRectangle(0, 0, 0);
-}
-

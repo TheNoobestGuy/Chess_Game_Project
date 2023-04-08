@@ -50,8 +50,8 @@ struct Field_ID
 	int x;
 	int y;
 
+	bool available_move = true;
 	int move_axis = 0;
-	bool available_move = false;
 
 	bool operator==(const Field_ID& field) const
 	{
