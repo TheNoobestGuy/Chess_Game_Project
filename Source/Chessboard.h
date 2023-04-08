@@ -21,6 +21,7 @@ struct Field
 	Figure* figure = nullptr;
 	bool en_passant = false;
 	bool field_under_attack[2] = { false, false };
+	bool uavailable_for_king[2] = { false, false };
 
 	// Rectangle
 	SDL_Rect field_rect = GameEngine::CreateRectangle(field_ID.x, field_ID.y, field_size);
@@ -77,11 +78,11 @@ class Chessboard
 		void RenderFigures();
 
 		// Figures features
-		void MarkFieldsUnderAttack(std::vector<Figure*> player_figures, int array_pos);
+		void MarkFieldsUnderAttack(std::vector<Figure*> player_figures);
 		void CalculateFigureMoves(std::vector<Figure*> player_figures);
 		void KingMechanic(std::vector<Figure*> player_figures, Figure* king);
-		void CheckForEntangling(std::vector<Figure*> player_figures);
-		void EndGameConditions(std::vector<Figure*> player_figures, Figure* king, int array_pos);
+		void CheckForEntangling(std::vector<Figure*> player_figures, Figure* opposite_king);
+		void EndGameConditions(std::vector<Figure*> player_figures, Figure* king);
 		void PickedUpFigure();
 		void MoveFigure();
 

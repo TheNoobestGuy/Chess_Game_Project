@@ -54,6 +54,10 @@ class Figure
 		bool EnPassant() { return en_passant; }
 		void EnPassantVulnerablity() { en_passant = true; }
 
+		bool IsEntangled() { return entangled; }
+		void MakeEntangled() { entangled = true; };
+		void Release() { entangled = false; };
+
 		SDL_Rect* GetMotionRect() { return &motion_rect;  }
 
 		// ****************** TEST ******************

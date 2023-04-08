@@ -50,9 +50,17 @@ struct Field_ID
 	int x;
 	int y;
 
+	int move_axis = 0;
+	bool available_move = false;
+
 	bool operator==(const Field_ID& field) const
 	{
 		return field.x == x && field.y == y;
+	}
+
+	bool operator!=(const Field_ID& field) const
+	{
+		return field.x != x || field.y != y;
 	}
 };
 

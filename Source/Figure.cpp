@@ -25,6 +25,7 @@ Figure::~Figure() {}
 
 void Figure::PickUp(bool &figure_picked_up)
 {
+
 	if (GameEngine::CollisionDetector(GameEngine::mouse_x, GameEngine::mouse_y, &figure_rect) && GameEngine::mouse_left && !figure_picked_up)
 	{
 		picked_up = true;
@@ -35,7 +36,7 @@ void Figure::PickUp(bool &figure_picked_up)
 		picked_up = false;
 		figure_picked_up = false;
 	}
-
+	
 	if (picked_up)
 	{
 		motion_rect.x = GameEngine::mouse_x - (size / 2);
