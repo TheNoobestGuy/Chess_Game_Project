@@ -19,7 +19,6 @@ void Main_menu_scene(MainMenu* main_menu)
 
 				main_menu->initialize_scene = false;
 			}
-
 			main_menu->UpdateMainMenu();
 			main_menu->RenderMainMenu();
 
@@ -43,7 +42,7 @@ void Main_menu_scene(MainMenu* main_menu)
 				SDL_SetRenderDrawColor(GameEngine::renderer, 0, 0, 0, 255);
 				main_menu->CreateOptions();
 
-				main_menu->initialize_scene = false;
+				main_menu->initialize_scene = true;
 			}
 
 			main_menu->UpdateOptions();

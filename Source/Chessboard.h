@@ -41,6 +41,9 @@ class Chessboard
 		int fields_size;
 
 		// Update
+		bool end_screen;
+		bool end_game;
+		bool reset_game;
 		bool checkmate;
 		bool figure_picked_up;
 		bool make_move;
@@ -58,6 +61,9 @@ class Chessboard
 		std::vector<Figure*> white_player;
 		std::vector<Figure*> black_player;
 		std::stack<Figure*> removed_figures;
+		
+		// End game
+		Text white_won, black_won, pat, reset;
 
 	public:
 		Chessboard(int fields_size);

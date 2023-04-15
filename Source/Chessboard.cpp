@@ -7,6 +7,9 @@ Chessboard::Chessboard(int fields_size)
 	this->fields_size = fields_size;
 
 	// Update
+	this->end_screen = false;
+	this->end_game = false;
+	this->reset_game = false;
 	this->checkmate = false;
 	this->figure_picked_up = false;
 	this->make_move = false;
@@ -37,6 +40,12 @@ Chessboard::Chessboard(int fields_size)
 	{
 		figure = nullptr;
 	}
+
+	// Text
+	white_won = { "White player won", {0, 0, 0}, GameEngine::CreateRectangle(SCREEN_WIDTH/2 - 150, SCREEN_HEIGHT/2 - 100, 300, 100) };
+	black_won = { "Black player won", {0, 0, 0}, GameEngine::CreateRectangle(SCREEN_WIDTH/2 - 150, SCREEN_HEIGHT/2 - 100, 300, 100) };
+	pat = { "Remis", {0, 0, 0}, GameEngine::CreateRectangle(SCREEN_WIDTH/2 - 150, SCREEN_HEIGHT/2 - 100, 300, 100) };
+	reset = { "Press any key to go back to main menu or mouse to reset game", {0, 0, 0}, GameEngine::CreateRectangle(SCREEN_WIDTH/2 - 250, SCREEN_HEIGHT/2, 500, 50) };
 }
 
 Chessboard::~Chessboard() {}
@@ -169,6 +178,7 @@ void Chessboard::BoardUpdate()
 				{
 					if (white_player[figure]->GetID() == removed_figures.top()->GetID())
 					{
+						delete white_player[figure];
 						white_player[figure] = nullptr;
 						white_player.erase(white_player.begin() + figure);
 						removed_figures.pop();
@@ -182,12 +192,45 @@ void Chessboard::BoardUpdate()
 				{
 					if (black_player[figure]->GetID() == removed_figures.top()->GetID())
 					{
+						delete black_player[figure];
 						black_player[figure] = nullptr;
 						black_player.erase(black_player.begin() + figure);
 						removed_figures.pop();
 						break;
 					}
 				}
+			}
+		}
+
+		// Check does any pawn has become queen
+		for (int figure = 0; figure < white_player.size(); figure++)
+		{
+			if (white_player[figure]->GetName() == "Pawn" && white_player[figure]->GetField().y == 0)
+			{
+				int tempID = white_player[figure]->GetID();
+				Field_ID tempField = white_player[figure]->GetField();
+
+				delete white_player[figure];
+				white_player[figure] = nullptr;
+				white_player.erase(white_player.begin() + figure);
+
+				white_player.push_back(new Queen("Queen", tempID, tempField, 0, 64));
+				white_player.back()->PossibleMoves();
+			}
+		}
+		for (int figure = 0; figure < black_player.size(); figure++)
+		{
+			if (black_player[figure]->GetName() == "Pawn" && black_player[figure]->GetField().y == 7)
+			{
+				int tempID = black_player[figure]->GetID();
+				Field_ID tempField = black_player[figure]->GetField();
+
+				delete black_player[figure];
+				black_player[figure] = nullptr;
+				black_player.erase(black_player.begin() + figure);
+
+				black_player.push_back(new Queen("Queen", tempID, tempField, 1, 64));
+				black_player.back()->PossibleMoves();
 			}
 		}
 
@@ -253,30 +296,42 @@ void Chessboard::BoardUpdate()
 		KingMechanic(white_player, black_player, white_king);
 		KingMechanic(black_player, white_player, black_king);
 
-		// End game conditions check
-		EndGameConditions(white_player, white_king);
-		EndGameConditions(black_player, black_king);
-
 		update_board = false;
 	}
 }
 
 void Chessboard::SwitchTurns()
 {
-	if (update_board)
+	// End game conditions check
+	EndGameConditions(white_player, white_king);
+	if (!end_game && !reset_game)
+		EndGameConditions(black_player, black_king);
+
+	if (end_game)
 	{
-		switch (player)
+		GameEngine::stage = 0;
+	}
+	else if (reset_game)
+	{
+		GameEngine::initialize_stage = true;
+	}
+	else
+	{
+		if (update_board)
 		{
-		case 1:
-			player = 2;
-			break;
+			switch (player)
+			{
+			case 1:
+				player = 2;
+				break;
 
-		case 2:
-			player = 1;
-			break;
+			case 2:
+				player = 1;
+				break;
 
-		default:
-			break;
+			default:
+				break;
+			}
 		}
 	}
 }
@@ -522,19 +577,91 @@ void Chessboard::EndGameConditions(std::vector<Figure*> player_figures, Figure* 
 	// Win by checkmate
 	if (no_moves && checkmate)
 	{
-		if (king->GetPlayer() == 1)
+		update_board = false;
+		end_screen = true;
+
+		while (end_screen)
 		{
-			std::cout << "BLACK PLAYER WON" << std::endl;
+			SDL_RenderClear(GameEngine::renderer);
+
+			DrawBoard();
+			DrawFigures();
+
+			if (king->GetPlayer() == 1)
+			{
+				TextureMenager::DrawText(black_won);
+			}
+			else if (king->GetPlayer() == 2)
+			{
+				TextureMenager::DrawText(white_won);
+			}
+
+			TextureMenager::DrawText(reset);
+
+			SDL_RenderPresent(GameEngine::renderer);
+
+			SDL_Event event;
+			SDL_PollEvent(&event); 
+
+			switch (event.type)
+			{
+				case SDL_KEYDOWN:
+					end_game = true;
+					end_screen = false;
+					break;
+
+				case SDL_MOUSEBUTTONDOWN:
+					reset_game = true;
+					end_screen = false;
+					break;
+
+				default:
+					break;
+			}
 		}
-		else if (king->GetPlayer() == 2)
-		{
-			std::cout << "WHITE PLAYER WON" << std::endl;
-		}
+
+		GameEngine::mouse_left = false;
 	}
 	// Pat
 	else if (no_moves)
 	{
-		std::cout << "PAT" << std::endl;
+		update_board = false;
+		end_screen = true;
+
+		while (end_screen)
+		{
+			SDL_RenderClear(GameEngine::renderer);
+
+			DrawBoard();
+			DrawFigures();
+
+			TextureMenager::DrawText(pat);
+
+			TextureMenager::DrawText(reset);
+
+			SDL_RenderPresent(GameEngine::renderer);
+
+			SDL_Event event;
+			SDL_PollEvent(&event);
+
+			switch (event.type)
+			{
+			case SDL_KEYDOWN:
+				end_game = true;
+				end_screen = false;
+				break;
+
+			case SDL_MOUSEBUTTONDOWN:
+				reset_game = true;
+				end_screen = false;
+				break;
+
+			default:
+				break;
+			}
+		}
+
+		GameEngine::mouse_left = false;
 	}
 }
 
