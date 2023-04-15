@@ -42,7 +42,6 @@ Chessboard::Chessboard(int fields_size)
 	}
 
 	// Text
-<<<<<<< HEAD
 	white_won = { "White player won", {0, 0, 0},
 		GameEngine::CreateRectangle(SCREEN_WIDTH/2 - 150, SCREEN_HEIGHT/2 - 100, 300, 100), TextureMenager::LoadFont(white_won.text, white_won.color) };
 
@@ -54,12 +53,12 @@ Chessboard::Chessboard(int fields_size)
 
 	reset = { "Press any key to go back to main menu or mouse to reset game", {0, 0, 0}, 
 		GameEngine::CreateRectangle(SCREEN_WIDTH/2 - 250, SCREEN_HEIGHT/2, 500, 50), TextureMenager::LoadFont(reset.text, reset.color) };
-=======
+
 	white_won = { "White player won", {0, 0, 0}, GameEngine::CreateRectangle(SCREEN_WIDTH/2 - 150, SCREEN_HEIGHT/2 - 100, 300, 100) };
 	black_won = { "Black player won", {0, 0, 0}, GameEngine::CreateRectangle(SCREEN_WIDTH/2 - 150, SCREEN_HEIGHT/2 - 100, 300, 100) };
 	pat = { "Remis", {0, 0, 0}, GameEngine::CreateRectangle(SCREEN_WIDTH/2 - 150, SCREEN_HEIGHT/2 - 100, 300, 100) };
 	reset = { "Press any key to go back to main menu or mouse to reset game", {0, 0, 0}, GameEngine::CreateRectangle(SCREEN_WIDTH/2 - 250, SCREEN_HEIGHT/2, 500, 50) };
->>>>>>> 2d3e9b2 (Fully playable chess game)
+
 }
 
 Chessboard::~Chessboard() {}
@@ -324,7 +323,6 @@ void Chessboard::SwitchTurns()
 	if (end_game)
 	{
 		GameEngine::stage = 0;
-<<<<<<< HEAD
 
 		// Delete objects
 		for (int row = 0; row < 8; row++)
@@ -364,44 +362,19 @@ void Chessboard::SwitchTurns()
 			delete figure;
 		}
 	}
-	else
+
+	// Switch turns
+	if (update_board)
 	{
-		if (update_board)
+		switch (player)
 		{
-			switch (player)
-			{
-			case 1:
-				player = 2;
-				break;
+		case 1:
+			player = 2;
+			break;
 
-			case 2:
-				player = 1;
-				break;
-
-=======
-	}
-	else if (reset_game)
-	{
-		GameEngine::initialize_stage = true;
-	}
-	else
-	{
-		if (update_board)
-		{
-			switch (player)
-			{
-			case 1:
-				player = 2;
-				break;
-
-			case 2:
-				player = 1;
-				break;
-
->>>>>>> 2d3e9b2 (Fully playable chess game)
-			default:
-				break;
-			}
+		case 2:
+			player = 1;
+			break;
 		}
 	}
 }
@@ -659,7 +632,7 @@ void Chessboard::EndGameConditions(std::vector<Figure*> player_figures, Figure* 
 
 			if (king->GetPlayer() == 1)
 			{
-<<<<<<< HEAD
+
 				TextureMenager::Draw(black_won.unselected, black_won.rect);
 			}
 			else if (king->GetPlayer() == 2)
@@ -668,16 +641,6 @@ void Chessboard::EndGameConditions(std::vector<Figure*> player_figures, Figure* 
 			}
 
 			TextureMenager::Draw(reset.unselected, reset.rect);
-=======
-				TextureMenager::DrawText(black_won);
-			}
-			else if (king->GetPlayer() == 2)
-			{
-				TextureMenager::DrawText(white_won);
-			}
-
-			TextureMenager::DrawText(reset);
->>>>>>> 2d3e9b2 (Fully playable chess game)
 
 			SDL_RenderPresent(GameEngine::renderer);
 
@@ -716,15 +679,10 @@ void Chessboard::EndGameConditions(std::vector<Figure*> player_figures, Figure* 
 			DrawBoard();
 			DrawFigures();
 
-<<<<<<< HEAD
+
 			TextureMenager::Draw(pat.unselected, pat.rect);
 
 			TextureMenager::Draw(reset.unselected, reset.rect);
-=======
-			TextureMenager::DrawText(pat);
-
-			TextureMenager::DrawText(reset);
->>>>>>> 2d3e9b2 (Fully playable chess game)
 
 			SDL_RenderPresent(GameEngine::renderer);
 
@@ -733,18 +691,18 @@ void Chessboard::EndGameConditions(std::vector<Figure*> player_figures, Figure* 
 
 			switch (event.type)
 			{
-			case SDL_KEYDOWN:
-				end_game = true;
-				end_screen = false;
-				break;
+				case SDL_KEYDOWN:
+					end_game = true;
+					end_screen = false;
+					break;
 
-			case SDL_MOUSEBUTTONDOWN:
-				reset_game = true;
-				end_screen = false;
-				break;
+				case SDL_MOUSEBUTTONDOWN:
+					reset_game = true;
+					end_screen = false;
+					break;
 
-			default:
-				break;
+				default:
+					break;
 			}
 		}
 

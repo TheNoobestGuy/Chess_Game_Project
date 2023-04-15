@@ -41,12 +41,10 @@ void Main_menu_scene(MainMenu* main_menu)
 			{
 				SDL_SetRenderDrawColor(GameEngine::renderer, 0, 0, 0, 255);
 				main_menu->CreateOptions();
-<<<<<<< HEAD
-				main_menu->initialize_scene = false;
-=======
 
+				main_menu->initialize_scene = false;
 				main_menu->initialize_scene = true;
->>>>>>> 2d3e9b2 (Fully playable chess game)
+
 			}
 
 			main_menu->UpdateOptions();
