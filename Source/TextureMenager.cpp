@@ -13,3 +13,13 @@ void TextureMenager::Draw(SDL_Texture* texture, SDL_Rect& srcRect, SDL_Rect& des
 {
 	SDL_RenderCopy(GameEngine::renderer, texture, &srcRect, &destRect);
 }
+
+void TextureMenager::DrawText(Text text)
+{
+	SDL_Surface* surface = TTF_RenderText_Solid(TTF_OpenFont("Assets/Font/BebasNeue-Regular.ttf", 24), text.text, text.color);
+	SDL_Texture* texture = SDL_CreateTextureFromSurface(GameEngine::renderer, surface);
+
+	SDL_FreeSurface(surface);
+
+	SDL_RenderCopy(GameEngine::renderer, texture, NULL, &text.rect);
+}

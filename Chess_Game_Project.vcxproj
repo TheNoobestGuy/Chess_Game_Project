@@ -108,13 +108,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>D:\SDL-Project\Chess_Game_Project\Libraries\SDL2_Image\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\SDL-Project\Chess_Game_Project\Libraries\SDL2_Image\include;D:\SDL-Project\Chess_Game_Project\Libraries\SDL2_ttf;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>D:\SDL-Project\Chess_Game_Project\Libraries\SDL2_Image\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:\SDL-Project\Chess_Game_Project\Libraries\SDL2_ttf;D:\SDL-Project\Chess_Game_Project\Libraries\SDL2_Image\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <ProjectReference>
       <UseLibraryDependencyInputs>true</UseLibraryDependencyInputs>
@@ -137,6 +137,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\MainMenu.cpp" />
     <ClCompile Include="Source\Figure.cpp" />
     <ClCompile Include="Source\GameEngine.cpp" />
     <ClCompile Include="Source\Chessboard.cpp" />
@@ -144,6 +145,9 @@
     <ClCompile Include="Source\TextureMenager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Libraries\SDL2_ttf\SDL_ttf.h" />
+    <ClInclude Include="Source\Constants.h" />
+    <ClInclude Include="Source\MainMenu.h" />
     <ClInclude Include="Source\Bishop.h" />
     <ClInclude Include="Source\King.h" />
     <ClInclude Include="Source\Knight.h" />
@@ -154,15 +158,16 @@
     <ClInclude Include="Source\GameEngine.h" />
     <ClInclude Include="Libraries\SDL2_Image\include\SDL_image.h" />
     <ClInclude Include="Source\Chessboard.h" />
+    <ClInclude Include="Source\Scenes.h" />
     <ClInclude Include="Source\TextureMenager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitattributes" />
     <None Include=".gitignore" />
     <None Include="SDL2_image.dll" />
+    <None Include="SDL2_ttf.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="C:\Users\Administrator\Downloads\Mark.png" />
     <Image Include="Textures\Chessboard\1.png" />
     <Image Include="Textures\Chessboard\2.png" />
     <Image Include="Textures\Chessboard\3.png" />
@@ -199,6 +204,10 @@
   </ItemGroup>
   <ItemGroup>
     <Library Include="Libraries\SDL2_Image\lib\x64\SDL2_image.lib" />
+    <Library Include="Libraries\SDL2_ttf\SDL2_ttf.lib" />
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="Assets\Font\BebasNeue-Regular.ttf" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

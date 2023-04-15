@@ -21,7 +21,6 @@ struct Field
 	Figure* figure = nullptr;
 	bool en_passant = false;
 	bool field_under_attack[2] = { false, false };
-	bool unavailable_for_king[2] = { false, false };
 
 	// Rectangle
 	SDL_Rect field_rect = GameEngine::CreateRectangle(field_ID.x, field_ID.y, field_size);

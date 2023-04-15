@@ -3,6 +3,12 @@
 // Renderer
 SDL_Renderer* GameEngine::renderer = nullptr;
 
+// Load scene
+bool GameEngine::isRunning;
+int GameEngine::stage;
+bool GameEngine::initialize_stage;
+
+
 // Mouse tracer
 bool GameEngine::mouse_left;
 int GameEngine::mouse_x;
@@ -22,6 +28,9 @@ void GameEngine::Init(const char* title, int x, int y, int width, int height, bo
 
 		// Window Creating
 		window = SDL_CreateWindow(title, x, y, width, height, flags);
+
+		// Init SDL fonts
+		TTF_Init();
 
 		if (window)
 		{
@@ -83,9 +92,12 @@ void GameEngine::EventHandler()
 
 void GameEngine::Clean()
 {
+	TTF_Quit();
+
 	SDL_DestroyWindow(window);
 	SDL_DestroyRenderer(renderer);
 	SDL_Quit();
+
 	printf("Game Successfully Closed!\n");
 }
 
@@ -97,6 +109,18 @@ SDL_Rect GameEngine::CreateRectangle(int pos_x, int pos_y, int size)
 	rect.x = pos_x * size;
 	rect.y = pos_y * size;
 	rect.w = rect.h = size;
+
+	return rect;
+}
+
+SDL_Rect GameEngine::CreateRectangle(int pos_x, int pos_y, int width, int height)
+{
+	SDL_Rect rect;
+
+	rect.x = pos_x;
+	rect.y = pos_y;
+	rect.w = width;
+	rect.h = height;
 
 	return rect;
 }

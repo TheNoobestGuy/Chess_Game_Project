@@ -32,6 +32,7 @@ Chessboard::Chessboard(int fields_size)
 	{
 		figure = nullptr;
 	}
+
 	for (Figure* figure : black_player)
 	{
 		figure = nullptr;
@@ -533,7 +534,7 @@ void Chessboard::EndGameConditions(std::vector<Figure*> player_figures, Figure* 
 	// Pat
 	else if (no_moves)
 	{
-		std::cout << "REMIS" << std::endl;
+		std::cout << "PAT" << std::endl;
 	}
 }
 
@@ -685,7 +686,7 @@ void Chessboard::CalculateFigureMoves(std::vector<Figure*> player_figures)
 									figure->available_moves.back().available_move = true;
 
 									// If king is encountered append way that is leading to him to proper array
-									if (chessboard[move_y][move_x]->figure->GetName() == "King" && chessboard[move_y][move_x]->figure->GetPlayer() != figure->GetPlayer())
+									if (chessboard[move_y][move_x]->figure->GetName() == "King")
 									{
 										figure->way_to_opposite_king = way_to_king;
 										way_to_king.clear();
@@ -751,6 +752,13 @@ void Chessboard::CalculateFigureMoves(std::vector<Figure*> player_figures)
 						if (chessboard[move_y][move_x]->figure->GetPlayer() != figure->GetPlayer())
 						{
 							figure->available_moves.push_back({ move_x, move_y });
+
+							// If king is encountered append way that is leading to him to proper array
+							if (chessboard[move_y][move_x]->figure->GetName() == "King")
+							{
+								figure->way_to_opposite_king.push_back(figure->GetField());
+								figure->way_to_opposite_king.push_back({ move_x, move_y });
+							}
 						}
 						else if (chessboard[move_y][move_x]->figure->GetPlayer() == figure->GetPlayer())
 						{
@@ -803,6 +811,13 @@ void Chessboard::CalculateFigureMoves(std::vector<Figure*> player_figures)
 					if (chessboard[attack_y][attack_x]->figure != nullptr && chessboard[attack_y][attack_x]->figure->GetPlayer() != figure->GetPlayer())
 					{
 						figure->available_moves.push_back({ attack_x, attack_y });
+
+						// If king is encountered append way that is leading to him to proper array
+						if (chessboard[attack_y][attack_x]->figure->GetName() == "King")
+						{
+							figure->way_to_opposite_king.push_back(figure->GetField());
+							figure->way_to_opposite_king.push_back({ attack_x, attack_y });
+						}
 					}
 					else if (chessboard[attack_y][attack_x]->figure != nullptr && chessboard[attack_y][attack_x]->figure->GetPlayer() == figure->GetPlayer())
 					{

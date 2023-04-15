@@ -33,6 +33,9 @@
     <ClCompile Include="Source\Figure.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\MainMenu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\TextureMenager.h">
@@ -68,11 +71,24 @@
     <ClInclude Include="Source\King.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Scenes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\MainMenu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Libraries\SDL2_ttf\SDL_ttf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Constants.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitattributes" />
     <None Include=".gitignore" />
     <None Include="SDL2_image.dll" />
+    <None Include="SDL2_ttf.dll" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Textures\Chessboard\whiteSqr.png">
@@ -168,9 +184,6 @@
     <Image Include="Textures\Chessboard\H.png">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="C:\Users\Administrator\Downloads\Mark.png">
-      <Filter>Resource Files</Filter>
-    </Image>
     <Image Include="Textures\Chessboard\mark.png">
       <Filter>Resource Files</Filter>
     </Image>
@@ -180,5 +193,9 @@
   </ItemGroup>
   <ItemGroup>
     <Library Include="Libraries\SDL2_Image\lib\x64\SDL2_image.lib" />
+    <Library Include="Libraries\SDL2_ttf\SDL2_ttf.lib" />
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="Assets\Font\BebasNeue-Regular.ttf" />
   </ItemGroup>
 </Project>
