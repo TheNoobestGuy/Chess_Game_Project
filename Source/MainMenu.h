@@ -8,15 +8,15 @@ class MainMenu
 		int selected;
 		Text* marked;
 
+	public:
+		MainMenu();
+		~MainMenu();
+
 		// Main menu
 		Text menu_selection[5];
 
 		// Options
 		Text options_selection[1];
-
-	public:
-		MainMenu();
-		~MainMenu();
 
 		// Scenes handling
 		int scene;

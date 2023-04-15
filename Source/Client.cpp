@@ -65,6 +65,7 @@ int main(int argc, char* args[])
 
 				if (GameEngine::stage != 1)
 				{
+					// Chessboard
 					chessboard = nullptr;
 					GameEngine::initialize_stage = true;
 				}

@@ -42,10 +42,24 @@ Chessboard::Chessboard(int fields_size)
 	}
 
 	// Text
+<<<<<<< HEAD
+	white_won = { "White player won", {0, 0, 0},
+		GameEngine::CreateRectangle(SCREEN_WIDTH/2 - 150, SCREEN_HEIGHT/2 - 100, 300, 100), TextureMenager::LoadFont(white_won.text, white_won.color) };
+
+	black_won = { "Black player won", {0, 0, 0}, 
+		GameEngine::CreateRectangle(SCREEN_WIDTH/2 - 150, SCREEN_HEIGHT/2 - 100, 300, 100), TextureMenager::LoadFont(black_won.text, black_won.color) };
+
+	pat = { "Remis", {0, 0, 0}, 
+		GameEngine::CreateRectangle(SCREEN_WIDTH/2 - 150, SCREEN_HEIGHT/2 - 100, 300, 100), TextureMenager::LoadFont(pat.text, pat.color) };
+
+	reset = { "Press any key to go back to main menu or mouse to reset game", {0, 0, 0}, 
+		GameEngine::CreateRectangle(SCREEN_WIDTH/2 - 250, SCREEN_HEIGHT/2, 500, 50), TextureMenager::LoadFont(reset.text, reset.color) };
+=======
 	white_won = { "White player won", {0, 0, 0}, GameEngine::CreateRectangle(SCREEN_WIDTH/2 - 150, SCREEN_HEIGHT/2 - 100, 300, 100) };
 	black_won = { "Black player won", {0, 0, 0}, GameEngine::CreateRectangle(SCREEN_WIDTH/2 - 150, SCREEN_HEIGHT/2 - 100, 300, 100) };
 	pat = { "Remis", {0, 0, 0}, GameEngine::CreateRectangle(SCREEN_WIDTH/2 - 150, SCREEN_HEIGHT/2 - 100, 300, 100) };
 	reset = { "Press any key to go back to main menu or mouse to reset game", {0, 0, 0}, GameEngine::CreateRectangle(SCREEN_WIDTH/2 - 250, SCREEN_HEIGHT/2, 500, 50) };
+>>>>>>> 2d3e9b2 (Fully playable chess game)
 }
 
 Chessboard::~Chessboard() {}
@@ -310,6 +324,61 @@ void Chessboard::SwitchTurns()
 	if (end_game)
 	{
 		GameEngine::stage = 0;
+<<<<<<< HEAD
+
+		// Delete objects
+		for (int row = 0; row < 8; row++)
+		{
+			for (int col = 0; col < 8; col++)
+			{
+				delete chessboard[row][col];
+			}
+		}
+		for (Figure* figure : white_player)
+		{
+			delete figure;
+		}
+		for (Figure* figure : black_player)
+		{
+			delete figure;
+		}
+	}
+	else if (reset_game)
+	{
+		GameEngine::initialize_stage = true;
+
+		// Delete objects
+		for (int row = 0; row < 8; row++)
+		{
+			for (int col = 0; col < 8; col++)
+			{
+				delete chessboard[row][col];
+			}
+		}
+		for (Figure* figure : white_player)
+		{
+			delete figure;
+		}
+		for (Figure* figure : black_player)
+		{
+			delete figure;
+		}
+	}
+	else
+	{
+		if (update_board)
+		{
+			switch (player)
+			{
+			case 1:
+				player = 2;
+				break;
+
+			case 2:
+				player = 1;
+				break;
+
+=======
 	}
 	else if (reset_game)
 	{
@@ -329,6 +398,7 @@ void Chessboard::SwitchTurns()
 				player = 1;
 				break;
 
+>>>>>>> 2d3e9b2 (Fully playable chess game)
 			default:
 				break;
 			}
@@ -589,6 +659,16 @@ void Chessboard::EndGameConditions(std::vector<Figure*> player_figures, Figure* 
 
 			if (king->GetPlayer() == 1)
 			{
+<<<<<<< HEAD
+				TextureMenager::Draw(black_won.unselected, black_won.rect);
+			}
+			else if (king->GetPlayer() == 2)
+			{
+				TextureMenager::Draw(white_won.unselected, white_won.rect);
+			}
+
+			TextureMenager::Draw(reset.unselected, reset.rect);
+=======
 				TextureMenager::DrawText(black_won);
 			}
 			else if (king->GetPlayer() == 2)
@@ -597,6 +677,7 @@ void Chessboard::EndGameConditions(std::vector<Figure*> player_figures, Figure* 
 			}
 
 			TextureMenager::DrawText(reset);
+>>>>>>> 2d3e9b2 (Fully playable chess game)
 
 			SDL_RenderPresent(GameEngine::renderer);
 
@@ -635,9 +716,15 @@ void Chessboard::EndGameConditions(std::vector<Figure*> player_figures, Figure* 
 			DrawBoard();
 			DrawFigures();
 
+<<<<<<< HEAD
+			TextureMenager::Draw(pat.unselected, pat.rect);
+
+			TextureMenager::Draw(reset.unselected, reset.rect);
+=======
 			TextureMenager::DrawText(pat);
 
 			TextureMenager::DrawText(reset);
+>>>>>>> 2d3e9b2 (Fully playable chess game)
 
 			SDL_RenderPresent(GameEngine::renderer);
 
@@ -921,7 +1008,6 @@ void Chessboard::CalculateFigureMoves(std::vector<Figure*> player_figures)
 						if (chessboard[move_y][move_x]->figure == nullptr)
 						{
 							figure->available_moves.push_back({ move_x, move_y });
-							figure->EnPassantVulnerablity();
 						}
 					}
 				}
@@ -965,8 +1051,10 @@ void Chessboard::CalculateFigureMoves(std::vector<Figure*> player_figures)
 					{
 						if (chessboard[en_passant_y][en_passant_x]->figure->GetName() == "Pawn" && chessboard[en_passant_y][en_passant_x]->figure->GetPlayer() != figure->GetPlayer())
 						{
-							en_passant_x = figure->GetField().x + figure->moves_list[en_passant - 2].x;
-							en_passant_y = figure->GetField().y + figure->moves_list[en_passant - 2].y;
+							int buffor = en_passant - 2;
+
+							en_passant_x = figure->GetField().x + figure->moves_list[buffor].x;
+							en_passant_y = figure->GetField().y + figure->moves_list[buffor].y;
 
 							if (chessboard[en_passant_y][en_passant_x]->figure == nullptr)
 							{
@@ -1108,6 +1196,13 @@ void Chessboard::MoveFigure()
 					else if (player == 2)
 					{
 						removed_figures.push(chessboard[move_to.y - 1][move_to.x]->figure);
+					}
+				}
+				else if (move_to.attacked_figure == nullptr)
+				{
+					if (abs(move_to.y - current_figure->GetField().y) == 2)
+					{
+						current_figure->EnPassantVulnerablity();
 					}
 				}
 			}

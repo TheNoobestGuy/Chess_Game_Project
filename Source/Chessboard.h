@@ -132,5 +132,4 @@ class Chessboard
 			TextureMenager::LoadTexture("Textures/Chessboard/G.png"),
 			TextureMenager::LoadTexture("Textures/Chessboard/H.png")
 		};
-		// TEST
 };

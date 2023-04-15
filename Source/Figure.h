@@ -57,7 +57,7 @@ class Figure
 
 		bool IsItEntangled() { return entangled; }
 		void MakeEntangled() { entangled = true; };
-		void Release() { entangled_moves.clear(); entangled = false; way_to_opposite_king.clear(); }
+		void Release() { entangled_moves.clear(); entangled = false; way_to_opposite_king.clear();}
 
 		SDL_Rect* GetMotionRect() { return &motion_rect;  }
 };
