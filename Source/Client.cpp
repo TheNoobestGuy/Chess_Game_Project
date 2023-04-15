@@ -44,7 +44,7 @@ int main(int argc, char* args[])
 
 				if (GameEngine::stage != 0)
 				{
-					main_menu = nullptr;
+					delete main_menu;
 					GameEngine::initialize_stage = true;
 				}
 				break;
@@ -55,9 +55,6 @@ int main(int argc, char* args[])
 				{
 					std::cout << "Chessboard initialized!" << std::endl;
 					chessboard = new Chessboard(64);
-					chessboard->CreateBoard();
-					chessboard->CreateFigures();
-
 					GameEngine::initialize_stage = false;
 				}
 
@@ -65,10 +62,14 @@ int main(int argc, char* args[])
 
 				if (GameEngine::stage != 1)
 				{
-					// Chessboard
-					chessboard = nullptr;
+					delete chessboard;
 					GameEngine::initialize_stage = true;
 				}
+				break;
+
+			// Exit
+			case 2:
+				GameEngine::isRunning = false;
 				break;
 
 			default:
@@ -84,7 +85,7 @@ int main(int argc, char* args[])
 			SDL_Delay(frameDelay - deltaTime);
 		}
 	}
-	
+
 	game_engine->Clean();
 
 	return 0;

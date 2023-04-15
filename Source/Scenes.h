@@ -15,8 +15,6 @@ void Main_menu_scene(MainMenu* main_menu)
 			if (main_menu->initialize_scene)
 			{
 				SDL_SetRenderDrawColor(GameEngine::renderer, 0, 0, 0, 255);
-				main_menu->CreateMainMenu();
-
 				main_menu->initialize_scene = false;
 			}
 			main_menu->UpdateMainMenu();
@@ -40,11 +38,7 @@ void Main_menu_scene(MainMenu* main_menu)
 			if (main_menu->initialize_scene)
 			{
 				SDL_SetRenderDrawColor(GameEngine::renderer, 0, 0, 0, 255);
-				main_menu->CreateOptions();
-
 				main_menu->initialize_scene = false;
-				main_menu->initialize_scene = true;
-
 			}
 
 			main_menu->UpdateOptions();

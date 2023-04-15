@@ -42,6 +42,7 @@ class Chessboard
 
 		// Update
 		bool end_screen;
+		bool quit;
 		bool end_game;
 		bool reset_game;
 		bool checkmate;

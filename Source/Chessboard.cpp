@@ -7,6 +7,7 @@ Chessboard::Chessboard(int fields_size)
 	this->fields_size = fields_size;
 
 	// Update
+	this->quit = false;
 	this->end_screen = false;
 	this->end_game = false;
 	this->reset_game = false;
@@ -16,49 +17,28 @@ Chessboard::Chessboard(int fields_size)
 	this->move_to = { 0, 0 };
 	this->update_board = true;
 
-	// Chessboard
-	for (int row = 0; row < 8; row++)
-	{
-		for (int col = 0; col < 8; col++)
-		{
-			chessboard[row][col] = nullptr;
-		}
-	}
-
 	// Figures
 	this->white_king = nullptr;
 	this->black_king = nullptr;
 	this->current_figure = nullptr;
 	this->last_collision = nullptr;
 
-	for (Figure* figure : white_player)
-	{
-		figure = nullptr;
-	}
+	// Create chessboard
+	CreateBoard();
+	CreateFigures();
 
-	for (Figure* figure : black_player)
-	{
-		figure = nullptr;
-	}
+	// Text test
+	white_won = { "White player won", {0, 0, 0}, GameEngine::CreateRectangle(SCREEN_WIDTH/2 - 150, SCREEN_HEIGHT/2 - 100, 300, 100)};
+	white_won.unselected = TextureMenager::LoadFont(white_won.text, white_won.color);
 
-	// Text
-	white_won = { "White player won", {0, 0, 0},
-		GameEngine::CreateRectangle(SCREEN_WIDTH/2 - 150, SCREEN_HEIGHT/2 - 100, 300, 100), TextureMenager::LoadFont(white_won.text, white_won.color) };
-
-	black_won = { "Black player won", {0, 0, 0}, 
-		GameEngine::CreateRectangle(SCREEN_WIDTH/2 - 150, SCREEN_HEIGHT/2 - 100, 300, 100), TextureMenager::LoadFont(black_won.text, black_won.color) };
-
-	pat = { "Remis", {0, 0, 0}, 
-		GameEngine::CreateRectangle(SCREEN_WIDTH/2 - 150, SCREEN_HEIGHT/2 - 100, 300, 100), TextureMenager::LoadFont(pat.text, pat.color) };
-
-	reset = { "Press any key to go back to main menu or mouse to reset game", {0, 0, 0}, 
-		GameEngine::CreateRectangle(SCREEN_WIDTH/2 - 250, SCREEN_HEIGHT/2, 500, 50), TextureMenager::LoadFont(reset.text, reset.color) };
-
-	white_won = { "White player won", {0, 0, 0}, GameEngine::CreateRectangle(SCREEN_WIDTH/2 - 150, SCREEN_HEIGHT/2 - 100, 300, 100) };
 	black_won = { "Black player won", {0, 0, 0}, GameEngine::CreateRectangle(SCREEN_WIDTH/2 - 150, SCREEN_HEIGHT/2 - 100, 300, 100) };
-	pat = { "Remis", {0, 0, 0}, GameEngine::CreateRectangle(SCREEN_WIDTH/2 - 150, SCREEN_HEIGHT/2 - 100, 300, 100) };
-	reset = { "Press any key to go back to main menu or mouse to reset game", {0, 0, 0}, GameEngine::CreateRectangle(SCREEN_WIDTH/2 - 250, SCREEN_HEIGHT/2, 500, 50) };
+	black_won.unselected = TextureMenager::LoadFont(black_won.text, black_won.color);
 
+	pat = { "Remis", {0, 0, 0}, GameEngine::CreateRectangle(SCREEN_WIDTH/2 - 150, SCREEN_HEIGHT/2 - 100, 300, 100) };
+	pat.unselected = TextureMenager::LoadFont(pat.text, pat.color);
+
+	reset = { "Press any key to go back to main menu or mouse to reset game", {0, 0, 0}, GameEngine::CreateRectangle(SCREEN_WIDTH/2 - 250, SCREEN_HEIGHT/2, 500, 50) };
+	reset.unselected = TextureMenager::LoadFont(reset.text, reset.color);
 }
 
 Chessboard::~Chessboard() {}
@@ -317,10 +297,14 @@ void Chessboard::SwitchTurns()
 {
 	// End game conditions check
 	EndGameConditions(white_player, white_king);
-	if (!end_game && !reset_game)
+	if (!end_game && !reset_game && !quit)
 		EndGameConditions(black_player, black_king);
 
-	if (end_game)
+	if (quit)
+	{
+		GameEngine::stage = 2;
+	}
+	else if (end_game)
 	{
 		GameEngine::stage = 0;
 
@@ -617,6 +601,9 @@ void Chessboard::EndGameConditions(std::vector<Figure*> player_figures, Figure* 
 		}
 	}
 
+	no_moves = true;
+	checkmate = true;
+
 	// Win by checkmate
 	if (no_moves && checkmate)
 	{
@@ -632,7 +619,6 @@ void Chessboard::EndGameConditions(std::vector<Figure*> player_figures, Figure* 
 
 			if (king->GetPlayer() == 1)
 			{
-
 				TextureMenager::Draw(black_won.unselected, black_won.rect);
 			}
 			else if (king->GetPlayer() == 2)
@@ -649,6 +635,11 @@ void Chessboard::EndGameConditions(std::vector<Figure*> player_figures, Figure* 
 
 			switch (event.type)
 			{
+				case SDL_QUIT:
+					quit = true;
+					end_screen = false;
+					break;
+
 				case SDL_KEYDOWN:
 					end_game = true;
 					end_screen = false;
@@ -679,7 +670,6 @@ void Chessboard::EndGameConditions(std::vector<Figure*> player_figures, Figure* 
 			DrawBoard();
 			DrawFigures();
 
-
 			TextureMenager::Draw(pat.unselected, pat.rect);
 
 			TextureMenager::Draw(reset.unselected, reset.rect);
@@ -691,6 +681,11 @@ void Chessboard::EndGameConditions(std::vector<Figure*> player_figures, Figure* 
 
 			switch (event.type)
 			{
+				case SDL_QUIT:
+					end_screen = false;
+					GameEngine::isRunning = false;
+					break;
+
 				case SDL_KEYDOWN:
 					end_game = true;
 					end_screen = false;

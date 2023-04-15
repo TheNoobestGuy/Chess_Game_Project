@@ -7,22 +7,19 @@ MainMenu::MainMenu()
 	this->scene = 0;
 	this->initialize_scene = true;
 
-	for (int i = 0; i < 5; i++)
-	{
-		menu_selection[i] = { nullptr, { 255, 255, 255 }, NULL };
-	}
-
-	for (int i = 0; i < 1; i++)
-	{
-		options_selection[i] = { nullptr, { 255, 255, 255 }, NULL };
-	}
-
+	CreateMainMenu();
+	CreateOptions();
 }
 
 MainMenu::~MainMenu() {}
 
 void MainMenu::CreateMainMenu()
 {
+	for (int i = 0; i < 5; i++)
+	{
+		menu_selection[i].color = { 255, 255, 255 };
+	}
+
 	menu_selection[0].text = "Chess Game Project";
 	menu_selection[0].rect = GameEngine::CreateRectangle(SCREEN_WIDTH/2 - 200, 60, 400, 100);
 	menu_selection[0].unselected = TextureMenager::LoadFont(menu_selection[0].text, menu_selection[0].color);
@@ -51,6 +48,11 @@ void MainMenu::CreateMainMenu()
 
 void MainMenu::CreateOptions()
 {
+	for (int i = 0; i < 1; i++)
+	{
+		options_selection[i].color = { 255, 255, 255 };
+	}
+
 	options_selection[0].text = "Back";
 	options_selection[0].rect = GameEngine::CreateRectangle(SCREEN_WIDTH - 100, SCREEN_HEIGHT - 45, 90, 40);
 	options_selection[0].unselected = TextureMenager::LoadFont(options_selection[0].text, options_selection[0].color);
